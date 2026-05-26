@@ -1,63 +1,63 @@
-# Personal website – Gert-Willem
+# Astro Starter Kit: Blog
 
-## Project overview
-Personal website that serves multiple purposes:
-- Showcase technical projects (ML/data engineering work)
-- Blog: technical write-ups + personal posts (travel, photography)
-- Photo section: moto trips and travel photography
-- About: coherent narrative of career transition
-- Long-term foundation for independent consultant branding
+```sh
+npm create astro@latest -- --template blog
+```
 
-## Stack
-- **Astro** — static site generator, markdown-native
-- **Keystatic** — git-based CMS, no external database, visual editor
-- **Netlify** — hosting + automatic deployment via GitHub
+> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
 
-## About the owner
-Gert-Willem, burgerlijk ingenieur-architect (KU Leuven, 2016), current
-student at 42 Belgium (Antwerp). Transitioning from residential
-architecture (design, permits, site management) into software/ML
-engineering. Not a junior developer — an engineer with domain expertise
-building a technical profile.
+Features:
 
-Technical projects to feature:
-- RAG pipeline (BM25 + local LLM)
-- Constrained decoding via logit manipulation (Qwen 0.6B)
-- Agent Smith — autonomous code agent, benchmarked on MBPP/SWE-bench
-- 42 projects in C and Python
+- ✅ Minimal styling (make it your own!)
+- ✅ 100/100 Lighthouse performance
+- ✅ SEO-friendly with canonical URLs and Open Graph data
+- ✅ Sitemap support
+- ✅ RSS Feed support
+- ✅ Markdown & MDX support
 
-Target roles: data engineering → ML engineering
-Region: Antwerp/Ghent
-Machine: Apple M1 Pro, 10 cores, 16GB unified memory
+## 🚀 Project Structure
 
-## Design direction
-- Clean and minimal — no corporate look, no generic AI-portfolio aesthetic
-- Photography should feel like a genuine part of the site, not decorative filler
-- Technical and personal content coexist under one roof — that's intentional
-- The site itself is a signal about how Gert-Willem builds things
+Inside of your Astro project, you'll see the following folders and files:
 
-## Content structure (planned)
-- **Home** — short intro, who this is, what you'll find
-- **Projects** — one page per significant technical project, with write-ups
-- **Blog** — technical posts + personal (moto trips, travel, thoughts)
-- **Photos** — moto travel and travel photography
-- **About** — the full story: architect → engineer transition, coherent narrative
+```text
+├── public/
+├── src/
+│   ├── assets/
+│   ├── components/
+│   ├── content/
+│   ├── layouts/
+│   └── pages/
+├── astro.config.mjs
+├── README.md
+├── package.json
+└── tsconfig.json
+```
 
-## Tone for all copy
-Direct, technically precise, no corporate lingo. Confident without
-arrogant. Same standard applies to commit messages, comments, and any
-generated placeholder text — no filler, no buzzwords.
+Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
 
-## Priorities for this build
-1. Get the Astro + Keystatic base running locally
-2. Define content collections (blog, projects, photos)
-3. Basic layout and navigation
-4. Design pass — typography, spacing, color
-5. Deploy to Netlify via GitHub
-6. Populate with real content
+There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
 
-## What to avoid
-- Generic hero sections with "I'm passionate about technology"
-- Excessive animations or visual noise
-- Over-engineered solutions for what is essentially a content site
-- Any dependency that adds recurring cost or external lock-in
+The `src/content/` directory contains "collections" of related Markdown and MDX documents. Use `getCollection()` to retrieve posts from `src/content/blog/`, and type-check your frontmatter using an optional schema. See [Astro's Content Collections docs](https://docs.astro.build/en/guides/content-collections/) to learn more.
+
+Any static assets, like images, can be placed in the `public/` directory.
+
+## 🧞 Commands
+
+All commands are run from the root of the project, from a terminal:
+
+| Command                   | Action                                           |
+| :------------------------ | :----------------------------------------------- |
+| `npm install`             | Installs dependencies                            |
+| `npm run dev`             | Starts local dev server at `localhost:4321`      |
+| `npm run build`           | Build your production site to `./dist/`          |
+| `npm run preview`         | Preview your build locally, before deploying     |
+| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
+| `npm run astro -- --help` | Get help using the Astro CLI                     |
+
+## 👀 Want to learn more?
+
+Check out [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+
+## Credit
+
+This theme is based off of the lovely [Bear Blog](https://github.com/HermanMartinus/bearblog/).

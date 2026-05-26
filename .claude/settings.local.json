@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p /Users/gert-willemvangompel/Documents/personal-site/src/content/work /Users/gert-willemvangompel/Documents/personal-site/src/content/build /Users/gert-willemvangompel/Documents/personal-site/src/content/travel)",
+      "Bash(npm install *)",
+      "Bash(npm view *)",
+      "Bash(npm run *)"
+    ],
+    "additionalDirectories": [
+      "/Users/gert-willemvangompel/Documents/personal-site/src/content"
+    ]
+  }
+}
