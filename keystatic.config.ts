@@ -20,7 +20,7 @@ export default config({
 					directory: 'src/assets/images/blog',
 					publicPath: '../../assets/images/blog',
 				}),
-				content: fields.markdoc({ label: 'Content' }),
+				content: fields.mdx({ label: 'Content' }),
 			},
 		}),
 
@@ -43,7 +43,7 @@ export default config({
 					itemLabel: (props) => props.fields.value.value ?? 'Technology',
 				}),
 				githubUrl: fields.url({ label: 'GitHub URL', validation: { isRequired: false } }),
-				content: fields.markdoc({ label: 'Content' }),
+				content: fields.mdx({ label: 'Content' }),
 			},
 		}),
 
@@ -69,7 +69,7 @@ export default config({
 					],
 					defaultValue: 'ongoing',
 				}),
-				content: fields.markdoc({ label: 'Content' }),
+				content: fields.mdx({ label: 'Content' }),
 			},
 		}),
 
@@ -87,12 +87,21 @@ export default config({
 					directory: 'src/assets/images/travel',
 					publicPath: '../../assets/images/travel',
 				}),
+				heroTitle: fields.text({ label: 'Hero title', description: 'Override text shown on the hero image. Falls back to title.' }),
 				country: fields.text({ label: 'Country' }),
 				distance: fields.number({
 					label: 'Distance (km)',
 					validation: { isRequired: false },
 				}),
-				content: fields.markdoc({ label: 'Content' }),
+				gallery: fields.array(
+					fields.image({
+						label: 'Photo',
+						directory: 'src/assets/images/travel',
+						publicPath: '../../assets/images/travel',
+					}),
+					{ label: 'Gallery' },
+				),
+				content: fields.mdx({ label: 'Content' }),
 			},
 		}),
 	},

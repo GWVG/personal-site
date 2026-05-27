@@ -1,0 +1,574 @@
+---
+import { Image, getImage } from 'astro:assets';
+import { type CollectionEntry, getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+
+export async function getStaticPaths() {
+	const posts = await getCollection('travel');
+	return posts.map((post) => ({
+		params: { slug: post.id },
+		props: post,
+	}));
+}
+
+type Props = CollectionEntry<'travel'>;
+
+const post = Astro.props;
+const { title, description, pubDate, country, distance, heroImage, heroTitle, gallery } = post.data;
+const { Content } = await render(post);
+
+// Hero background URL for CSS parallax (full-res, not displayed via <img>).
+const heroBgSrc = heroImage
+	? (await getImage({ src: heroImage, width: 1920, format: 'webp', quality: 88 })).src
+	: null;
+
+// Generate full-res URLs for the lightbox at build time.
+const galleryImages = gallery
+	? await Promise.all(
+			gallery.map(async (photo) => ({
+				photo,
+				fullSrc: (await getImage({ src: photo, width: 1800, format: 'webp', quality: 88 })).src,
+			})),
+		)
+	: [];
+---
+
+<BaseLayout title={title} description={description} image={heroImage}>
+	{
+		heroBgSrc && (
+			<div class="hero">
+				<div class="hero-bg" id="hero-bg" style={`background-image: url('${heroBgSrc}')`} />
+				<div class="hero-content">
+					<h1 class="hero-title">{heroTitle ?? title}</h1>
+				</div>
+			</div>
+		)
+	}
+
+	<main>
+		<article>
+			{
+				heroBgSrc ? (
+					<div class="post-header">
+						<h1>{title}</h1>
+						<div class="post-meta">
+							<span>{country}</span>
+							{!!distance && <span>{distance} km</span>}
+							<FormattedDate date={pubDate} />
+						</div>
+					</div>
+				) : (
+					<div class="prose article-header">
+						<h1>{title}</h1>
+						<div class="meta">
+							<span>{country}</span>
+							{!!distance && <span>{distance} km</span>}
+							<FormattedDate date={pubDate} />
+						</div>
+					</div>
+				)
+			}
+			<div class="prose">
+				<Content />
+			</div>
+		</article>
+	</main>
+
+	{
+		galleryImages.length > 0 && (
+			<>
+				<section class="gallery-section" aria-label="Photo gallery">
+					<p class="gallery-label">{galleryImages.length} photographs</p>
+					<div class="masonry">
+						{galleryImages.map(({ photo, fullSrc }, index) => (
+							<button
+								class="masonry-item"
+								data-index={String(index)}
+								data-full-src={fullSrc}
+								data-w={String(photo.width)}
+								data-h={String(photo.height)}
+								aria-label={`Open photo ${index + 1} of ${galleryImages.length}`}
+							>
+								<Image src={photo} alt="" width={800} loading="lazy" />
+							</button>
+						))}
+					</div>
+				</section>
+
+				<div
+					id="lightbox"
+					class="lightbox"
+					aria-hidden="true"
+					aria-modal="true"
+					role="dialog"
+					aria-label="Photo viewer"
+				>
+					<div class="lightbox-bg" id="lightbox-bg" />
+					<button class="lightbox-close" id="lightbox-close" aria-label="Close">
+						<svg
+							width="22"
+							height="22"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="1.5"
+							stroke-linecap="round"
+							aria-hidden="true"
+						>
+							<line x1="18" y1="6" x2="6" y2="18" />
+							<line x1="6" y1="6" x2="18" y2="18" />
+						</svg>
+					</button>
+					<button class="lightbox-nav lightbox-prev" id="lightbox-prev" aria-label="Previous photo">
+						<svg
+							width="28"
+							height="28"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="1.25"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							aria-hidden="true"
+						>
+							<polyline points="15 18 9 12 15 6" />
+						</svg>
+					</button>
+					<button class="lightbox-nav lightbox-next" id="lightbox-next" aria-label="Next photo">
+						<svg
+							width="28"
+							height="28"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="1.25"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							aria-hidden="true"
+						>
+							<polyline points="9 18 15 12 9 6" />
+						</svg>
+					</button>
+					<div class="lightbox-frame" id="lightbox-frame">
+						<img id="lightbox-img" src="" alt="" />
+					</div>
+					<span class="lightbox-counter" id="lightbox-counter" aria-live="polite" />
+				</div>
+			</>
+		)
+	}
+</BaseLayout>
+
+<style>
+	/* ─── Hero ─── */
+	.hero {
+		position: relative;
+		width: 100%;
+		height: 100vh;
+		overflow: hidden;
+		background-color: #111;
+	}
+
+	.hero-bg {
+		position: absolute;
+		inset: 0;
+		background-size: cover;
+		background-position: center bottom;
+		will-change: transform;
+	}
+
+	.hero-content {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 1;
+	}
+
+	.hero-title {
+		font-family: var(--font-display);
+		font-size: clamp(5rem, 6vw, 10rem);
+		color: #fff;
+		margin: 0;
+		line-height: 1.1;
+		font-weight: 700;
+		letter-spacing: 0.02em;
+		text-transform: uppercase;
+		text-align: center;
+		padding: 0 2rem;
+	}
+
+	/* ─── Post header (below hero) ─── */
+	.post-header {
+		max-width: 720px;
+		margin: 0 auto;
+		text-align: center;
+		padding: 3.5rem 1rem 2rem;
+	}
+
+	.post-header h1 {
+		font-size: clamp(1.75rem, 4vw, 2.75rem);
+		color: rgb(var(--black));
+		margin: 0 0 0.9rem;
+		line-height: 1.15;
+		font-weight: 700;
+	}
+
+	.post-meta {
+		display: flex;
+		gap: 1.5rem;
+		justify-content: center;
+		flex-wrap: wrap;
+		color: rgb(var(--gray));
+		font-size: 0.78rem;
+		font-weight: 300;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+	}
+
+	/* ─── Prose ─── */
+	main {
+		width: 1100px;
+		max-width: calc(100% - 2em);
+	}
+
+	.prose {
+		width: 720px;
+		max-width: 100%;
+		margin: 0 auto;
+	}
+
+	/* Fallback header when no hero image */
+	.article-header {
+		padding-top: var(--nav-h);
+	}
+
+	.article-header h1 {
+		margin-bottom: 0.25rem;
+	}
+
+	.article-header .meta {
+		display: flex;
+		gap: 1.5rem;
+		flex-wrap: wrap;
+		color: rgb(var(--gray));
+		font-size: 0.95rem;
+		margin-bottom: 2rem;
+	}
+
+	/* ─── Gallery section ─── */
+	.gallery-section {
+		background: #0f0f0f;
+		padding: 5rem 0 6rem;
+		margin-top: 5rem;
+	}
+
+	.gallery-label {
+		text-align: center;
+		color: rgba(255, 255, 255, 0.18);
+		font-size: 0.7rem;
+		font-weight: 300;
+		letter-spacing: 0.25em;
+		text-transform: uppercase;
+		margin-bottom: 3rem;
+	}
+
+	/* ─── Masonry ─── */
+	.masonry {
+		max-width: 1440px;
+		margin: 0 auto;
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		grid-auto-rows: 4px;
+		gap: 3px;
+		padding: 0 3px;
+	}
+
+	.masonry-item {
+		overflow: hidden;
+		cursor: zoom-in;
+		border: none;
+		padding: 0;
+		background: transparent;
+		display: block;
+	}
+
+	.masonry-item img {
+		width: 100%;
+		height: auto;
+		display: block;
+		border-radius: 0;
+		transition:
+			transform 0.5s cubic-bezier(0.25, 0, 0.25, 1),
+			opacity 0.4s ease;
+	}
+
+	.masonry-item:hover img {
+		transform: scale(1.02);
+		opacity: 0.88;
+	}
+
+	/* ─── Lightbox ─── */
+	.lightbox {
+		position: fixed;
+		inset: 0;
+		z-index: 9999;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 0.3s ease;
+	}
+
+	.lightbox.is-open {
+		opacity: 1;
+		pointer-events: auto;
+	}
+
+	.lightbox-bg {
+		position: absolute;
+		inset: 0;
+		background: rgba(0, 0, 0, 0.97);
+		cursor: zoom-out;
+	}
+
+	.lightbox-frame {
+		position: relative;
+		z-index: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transform: scale(0.96);
+		transition: transform 0.35s cubic-bezier(0.25, 0, 0.25, 1);
+		pointer-events: none;
+	}
+
+	.lightbox.is-open .lightbox-frame {
+		transform: scale(1);
+	}
+
+	.lightbox-frame img {
+		max-width: 90vw;
+		max-height: 90vh;
+		object-fit: contain;
+		display: block;
+		border-radius: 0;
+		transition: opacity 0.2s ease;
+	}
+
+	.lightbox-close {
+		position: absolute;
+		top: 1.25rem;
+		right: 1.5rem;
+		z-index: 2;
+		color: rgba(255, 255, 255, 0.45);
+		background: none;
+		border: none;
+		cursor: pointer;
+		padding: 0.5rem;
+		line-height: 0;
+		transition: color 0.2s ease;
+	}
+
+	.lightbox-close:hover {
+		color: rgba(255, 255, 255, 0.9);
+	}
+
+	.lightbox-nav {
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+		z-index: 2;
+		color: rgba(255, 255, 255, 0.3);
+		background: none;
+		border: none;
+		cursor: pointer;
+		padding: 2rem 1.5rem;
+		line-height: 0;
+		transition: color 0.2s ease;
+	}
+
+	.lightbox-nav:hover {
+		color: rgba(255, 255, 255, 0.85);
+	}
+
+	.lightbox-prev {
+		left: 0;
+	}
+
+	.lightbox-next {
+		right: 0;
+	}
+
+	.lightbox-counter {
+		position: absolute;
+		bottom: 1.5rem;
+		left: 50%;
+		transform: translateX(-50%);
+		z-index: 2;
+		color: rgba(255, 255, 255, 0.25);
+		font-size: 0.7rem;
+		font-weight: 300;
+		letter-spacing: 0.2em;
+		font-variant-numeric: tabular-nums;
+		white-space: nowrap;
+	}
+
+	@media (max-width: 1024px) {
+		.masonry {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	@media (max-width: 640px) {
+		.masonry {
+			grid-template-columns: 1fr;
+			grid-auto-rows: auto;
+		}
+
+		.gallery-section {
+			padding: 3rem 0 4rem;
+		}
+
+		.lightbox-nav {
+			padding: 1.5rem 1rem;
+		}
+	}
+</style>
+
+<script>
+	// ─── Hero parallax ───
+	const heroBg = document.getElementById('hero-bg');
+	if (heroBg) {
+		let ticking = false;
+		window.addEventListener(
+			'scroll',
+			() => {
+				if (!ticking) {
+					requestAnimationFrame(() => {
+						(heroBg as HTMLElement).style.transform = `translateY(${window.scrollY * 0.4}px)`;
+						ticking = false;
+					});
+					ticking = true;
+				}
+			},
+			{ passive: true },
+		);
+	}
+
+	// ─── Masonry row-span calculation ───
+	const GAP = 3;
+	const ROW_H = 4;
+
+	function calcSpans() {
+		const grid = document.querySelector<HTMLElement>('.masonry');
+		if (!grid) return;
+		const cols = getComputedStyle(grid).gridTemplateColumns.split(' ').length;
+		if (cols === 1) {
+			grid.querySelectorAll<HTMLElement>('.masonry-item').forEach((item) => {
+				item.style.gridRowEnd = '';
+			});
+			return;
+		}
+		const colW = (grid.offsetWidth - GAP * (cols - 1) - GAP * 2) / cols;
+		grid.querySelectorAll<HTMLElement>('.masonry-item').forEach((item) => {
+			const w = Number(item.dataset.w);
+			const h = Number(item.dataset.h);
+			if (!w || !h) return;
+			const renderedH = (h / w) * colW;
+			item.style.gridRowEnd = `span ${Math.ceil((renderedH + GAP) / (ROW_H + GAP))}`;
+		});
+	}
+
+	calcSpans();
+	window.addEventListener('resize', calcSpans);
+
+	// ─── Lightbox ───
+	const el = document.getElementById('lightbox');
+	if (el) {
+		const img = document.getElementById('lightbox-img') as HTMLImageElement;
+		const counter = document.getElementById('lightbox-counter')!;
+		const items = Array.from(document.querySelectorAll<HTMLButtonElement>('.masonry-item'));
+		const fullSrcs = items.map((item) => item.dataset.fullSrc ?? '');
+		const thumbSrcs = items.map((item) => item.querySelector('img')?.src ?? '');
+
+		let current = 0;
+		let isOpen = false;
+
+		function preload(index: number) {
+			const p = new window.Image();
+			p.src = fullSrcs[index];
+		}
+
+		function setPhoto(index: number, src: string) {
+			img.style.opacity = '0';
+			const loader = new window.Image();
+			loader.onload = () => {
+				if (current === index) {
+					img.src = loader.src;
+					img.style.opacity = '1';
+				}
+			};
+			img.src = src;
+			if (img.complete && img.naturalWidth > 0) img.style.opacity = '1';
+			loader.src = src;
+			counter.textContent = `${index + 1} / ${items.length}`;
+		}
+
+		function open(index: number) {
+			current = index;
+			isOpen = true;
+			setPhoto(index, thumbSrcs[index]);
+			const loader = new window.Image();
+			loader.onload = () => {
+				if (current === index && isOpen) setPhoto(index, loader.src);
+			};
+			loader.src = fullSrcs[index];
+			el.classList.add('is-open');
+			el.setAttribute('aria-hidden', 'false');
+			document.body.style.overflow = 'hidden';
+			preload((index + 1) % items.length);
+			preload((index - 1 + items.length) % items.length);
+		}
+
+		function close() {
+			isOpen = false;
+			el.classList.remove('is-open');
+			el.setAttribute('aria-hidden', 'true');
+			document.body.style.overflow = '';
+			setTimeout(() => {
+				img.src = '';
+				img.style.opacity = '0';
+			}, 350);
+		}
+
+		function navigate(delta: number) {
+			const next = (current + delta + items.length) % items.length;
+			current = next;
+			setPhoto(next, thumbSrcs[next]);
+			const loader = new window.Image();
+			loader.onload = () => {
+				if (current === next && isOpen) setPhoto(next, loader.src);
+			};
+			loader.src = fullSrcs[next];
+			preload((next + 1) % items.length);
+			preload((next - 1 + items.length) % items.length);
+		}
+
+		items.forEach((item, i) => item.addEventListener('click', () => open(i)));
+		document.getElementById('lightbox-bg')!.addEventListener('click', close);
+		document.getElementById('lightbox-close')!.addEventListener('click', close);
+		document.getElementById('lightbox-prev')!.addEventListener('click', () => navigate(-1));
+		document.getElementById('lightbox-next')!.addEventListener('click', () => navigate(1));
+
+		document.addEventListener('keydown', (e) => {
+			if (!isOpen) return;
+			if (e.key === 'Escape') close();
+			if (e.key === 'ArrowLeft') navigate(-1);
+			if (e.key === 'ArrowRight') navigate(1);
+		});
+	}
+</script>

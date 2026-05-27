@@ -1,0 +1,62 @@
+---
+import { Image } from 'astro:assets';
+
+interface PhotoEntry {
+	src: ImageMetadata;
+	alt?: string;
+}
+
+interface Props {
+	images: PhotoEntry[];
+}
+
+const { images } = Astro.props;
+---
+
+<div class="photo-row">
+	{
+		images.map(({ src, alt }) => (
+			<figure class="photo-row-item">
+				<Image src={src} alt={alt ?? ''} widths={[600, 900, 1200]} sizes="(max-width: 640px) 100vw, 50vw" />
+				{alt && <figcaption>{alt}</figcaption>}
+			</figure>
+		))
+	}
+</div>
+
+<style>
+	.photo-row {
+		display: flex;
+		gap: 3px;
+		margin: 2.5rem 0;
+	}
+	.photo-row-item {
+		flex: 1 1 0;
+		min-width: 0;
+		margin: 0;
+	}
+	.photo-row-item img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+		border-radius: 0;
+	}
+	.photo-row-item figcaption {
+		margin-top: 0.45rem;
+		font-size: 0.78rem;
+		color: rgb(110, 108, 102);
+		text-align: center;
+		font-style: italic;
+		line-height: 1.4;
+	}
+	@media (max-width: 640px) {
+		.photo-row {
+			flex-direction: column;
+			gap: 3px;
+		}
+		.photo-row-item img {
+			height: auto;
+		}
+	}
+</style>

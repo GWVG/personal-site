@@ -1,49 +1,246 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { getImage } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const posts = (await getCollection('travel')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+
+const featured = posts[0] ?? null;
+
+const featuredBgSrc =
+	featured?.data.heroImage
+		? (await getImage({ src: featured.data.heroImage, width: 1920, format: 'webp', quality: 85 }))
+				.src
+		: null;
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<Header />
-		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This template
-				serves as a lightweight, minimally-styled starting point for anyone looking to build a personal
-				website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to
-				<a href="https://docs.astro.build/">read the docs</a>
-				or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out
-				<a href="https://github.com/Charca/astro-blog-template">astro-blog-template</a>
-				by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
-		</main>
-		<Footer />
-	</body>
-</html>
+<BaseLayout title="Gert-Willem van Gompel" description="Engineer. Builder. Rider.">
+	<!-- ─── Hero ─── -->
+	<section class="home-hero">
+		<h1 class="home-name">Gert-Willem</h1>
+		<p class="home-tagline">Engineer.&ensp;Builder.&ensp;Rider.</p>
+	</section>
+
+	<!-- ─── Featured travel ─── -->
+	{
+		featured && (
+			<section class="featured-section">
+				<a href={`/travel/${featured.id}/`} class="featured-card">
+					{featuredBgSrc && (
+						<div
+							class="featured-bg"
+							style={`background-image: url('${featuredBgSrc}')`}
+						/>
+					)}
+					<div class="featured-overlay">
+						<p class="featured-label">Latest trip</p>
+						<h2 class="featured-title">{featured.data.heroTitle ?? featured.data.title}</h2>
+						<p class="featured-meta">
+							{featured.data.country}
+							{!!featured.data.distance && <> &middot; {featured.data.distance} km</>}
+						</p>
+					</div>
+				</a>
+			</section>
+		)
+	}
+
+	<!-- ─── Section grid ─── -->
+	<section class="section-grid">
+		<a href="/work" class="section-card">
+			<span class="section-label">Work</span>
+			<span class="section-desc">Architecture & engineering</span>
+		</a>
+		<a href="/build" class="section-card">
+			<span class="section-label">Build</span>
+			<span class="section-desc">ML, agents, systems</span>
+		</a>
+		<a href="/travel" class="section-card">
+			<span class="section-label">Travel</span>
+			<span class="section-desc">Moto trips & photography</span>
+		</a>
+		<a href="/blog" class="section-card">
+			<span class="section-label">Blog</span>
+			<span class="section-desc">Notes & write-ups</span>
+		</a>
+	</section>
+</BaseLayout>
+
+<style>
+	/* ─── Hero ─── */
+	.home-hero {
+		height: 100vh;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+		padding: 0 2rem;
+	}
+
+	.home-name {
+		font-family: var(--font-display);
+		font-size: clamp(3rem, 8vw, 7rem);
+		font-weight: 700;
+		color: rgb(var(--black));
+		margin: 0;
+		line-height: 1;
+		text-transform: uppercase;
+		letter-spacing: 0.02em;
+	}
+
+	.home-tagline {
+		margin: 1.5rem 0 0;
+		font-size: clamp(0.7rem, 1.5vw, 0.85rem);
+		font-weight: 300;
+		letter-spacing: 0.28em;
+		text-transform: uppercase;
+		color: rgb(var(--gray));
+	}
+
+	/* ─── Featured travel ─── */
+	.featured-section {
+		padding: 0 2rem 1px;
+		max-width: 1200px;
+		margin: 0 auto;
+	}
+
+	.featured-card {
+		display: block;
+		position: relative;
+		height: 60vh;
+		min-height: 380px;
+		overflow: hidden;
+		text-decoration: none;
+		background: rgb(var(--gray-light));
+	}
+
+	.featured-bg {
+		position: absolute;
+		inset: 0;
+		background-size: cover;
+		background-position: center;
+		transition: transform 0.7s cubic-bezier(0.25, 0, 0.25, 1);
+	}
+
+	.featured-card:hover .featured-bg {
+		transform: scale(1.03);
+	}
+
+	.featured-overlay {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(to top, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0.12) 55%, transparent 100%);
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-end;
+		padding: 3rem;
+	}
+
+	.featured-label {
+		font-size: 0.68rem;
+		font-weight: 300;
+		letter-spacing: 0.22em;
+		text-transform: uppercase;
+		color: rgba(255, 255, 255, 0.45);
+		margin: 0 0 0.6rem;
+	}
+
+	.featured-title {
+		font-family: var(--font-display);
+		font-size: clamp(2rem, 4vw, 4rem);
+		font-weight: 700;
+		color: #fff;
+		margin: 0 0 0.6rem;
+		text-transform: uppercase;
+		letter-spacing: 0.02em;
+		line-height: 1.05;
+	}
+
+	.featured-meta {
+		font-size: 0.8rem;
+		font-weight: 300;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: rgba(255, 255, 255, 0.5);
+		margin: 0;
+	}
+
+	/* ─── Section grid ─── */
+	.section-grid {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 1px;
+		background: rgb(var(--gray-light));
+		border-top: 1px solid rgb(var(--gray-light));
+		max-width: 1200px;
+		margin: 0 auto;
+	}
+
+	.section-card {
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-end;
+		padding: 2.5rem 2rem;
+		background: #0f0f0f;
+		text-decoration: none;
+		min-height: 180px;
+		transition: background 0.2s ease;
+	}
+
+	.section-card:hover {
+		background: #111;
+	}
+
+	.section-label {
+		display: block;
+		font-family: var(--font-display);
+		font-size: 1.3rem;
+		font-weight: 700;
+		color: rgb(var(--black));
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		line-height: 1;
+		margin-bottom: 0.55rem;
+		transition: color 0.2s ease;
+	}
+
+	.section-card:hover .section-label {
+		color: var(--accent);
+	}
+
+	.section-desc {
+		display: block;
+		font-size: 0.78rem;
+		font-weight: 300;
+		color: rgb(var(--gray));
+		letter-spacing: 0.02em;
+	}
+
+	@media (max-width: 768px) {
+		.section-grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+
+		.featured-overlay {
+			padding: 2rem;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.featured-section {
+			padding: 0 0 1px;
+		}
+
+		.featured-card {
+			min-height: 300px;
+		}
+
+		.section-card {
+			padding: 1.75rem 1.25rem;
+			min-height: 140px;
+		}
+	}
+</style>

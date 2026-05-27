@@ -1,0 +1,284 @@
+---
+import { Image } from 'astro:assets';
+
+interface PhotoEntry {
+	src: ImageMetadata;
+	alt?: string;
+}
+
+interface Props {
+	images: PhotoEntry[];
+}
+
+const { images } = Astro.props;
+const single = images.length === 1;
+---
+
+<div class="carousel" data-carousel tabindex={single ? undefined : '0'} aria-roledescription="carousel" aria-label="Photo carousel">
+	<div class="carousel-inner">
+		<div class="carousel-viewport">
+			{
+				images.map(({ src, alt }, i) => (
+					<figure
+						class={`carousel-slide${i === 0 ? ' is-active' : ''}`}
+						role="group"
+						aria-roledescription="slide"
+						aria-label={`${i + 1} of ${images.length}`}
+						aria-hidden={i !== 0 ? 'true' : undefined}
+					>
+						<Image
+							src={src}
+							alt={alt ?? ''}
+							widths={[600, 900, 1200]}
+							sizes="(max-width: 720px) 100vw, 720px"
+						/>
+						{alt && <figcaption>{alt}</figcaption>}
+					</figure>
+				))
+			}
+		</div>
+
+		{
+			!single && (
+				<>
+					<button class="carousel-prev" aria-label="Previous photo">
+						<svg
+							width="22"
+							height="22"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="1.5"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							aria-hidden="true"
+						>
+							<polyline points="15 18 9 12 15 6" />
+						</svg>
+					</button>
+					<button class="carousel-next" aria-label="Next photo">
+						<svg
+							width="22"
+							height="22"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="1.5"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							aria-hidden="true"
+						>
+							<polyline points="9 18 15 12 9 6" />
+						</svg>
+					</button>
+				</>
+			)
+		}
+	</div>
+
+	{
+		!single && (
+			<div class="carousel-dots" role="tablist" aria-label="Photo navigation">
+				{images.map((_, i) => (
+					<button
+						class={`dot${i === 0 ? ' is-active' : ''}`}
+						role="tab"
+						aria-selected={i === 0 ? 'true' : 'false'}
+						aria-label={`Photo ${i + 1} of ${images.length}`}
+						data-index={String(i)}
+					/>
+				))}
+			</div>
+		)
+	}
+</div>
+
+<style>
+	.carousel {
+		margin: 2.5rem 0;
+		outline: none;
+	}
+	.carousel:focus-visible {
+		outline: 2px solid var(--accent);
+		outline-offset: 4px;
+		border-radius: 2px;
+	}
+	.carousel-inner {
+		position: relative;
+	}
+
+	/*
+	 * Height-adaptive slides: the active slide is position:relative so the
+	 * viewport naturally sizes to it. Inactive slides are position:absolute
+	 * and overlay from the top — overflow:hidden clips any extra height.
+	 */
+	.carousel-viewport {
+		position: relative;
+		overflow: hidden;
+	}
+	.carousel-slide {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		margin: 0;
+		opacity: 0;
+		transition: opacity 0.38s ease;
+		pointer-events: none;
+	}
+	.carousel-slide.is-active {
+		position: relative;
+		opacity: 1;
+		pointer-events: auto;
+	}
+	.carousel-slide img {
+		max-width: 100%;
+		max-height: 70vh;
+		width: auto;
+		height: auto;
+		display: block;
+		margin: 0 auto;
+		border-radius: 0;
+	}
+	.carousel-slide figcaption {
+		padding: 0.5rem 0.75rem 0.55rem;
+		font-size: 0.78rem;
+		color: rgb(var(--gray));
+		text-align: center;
+		font-style: italic;
+		line-height: 1.4;
+	}
+
+	/* Arrows */
+	.carousel-prev,
+	.carousel-next {
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+		z-index: 1;
+		background: rgba(0, 0, 0, 0.32);
+		border: none;
+		color: rgba(255, 255, 255, 0.55);
+		cursor: pointer;
+		padding: 0.65rem 0.55rem;
+		line-height: 0;
+		border-radius: 2px;
+		transition:
+			background 0.2s ease,
+			color 0.2s ease;
+	}
+	.carousel-prev {
+		left: 0;
+	}
+	.carousel-next {
+		right: 0;
+	}
+	.carousel-prev:hover,
+	.carousel-next:hover {
+		background: rgba(0, 0, 0, 0.65);
+		color: #fff;
+	}
+
+	/* Dots */
+	.carousel-dots {
+		display: flex;
+		justify-content: center;
+		gap: 8px;
+		margin-top: 0.8rem;
+	}
+	.dot {
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		background: rgba(255, 255, 255, 0.18);
+		border: none;
+		cursor: pointer;
+		padding: 0;
+		transition:
+			background 0.2s ease,
+			transform 0.2s ease;
+	}
+	.dot.is-active {
+		background: var(--accent);
+		transform: scale(1.4);
+	}
+	.dot:hover:not(.is-active) {
+		background: rgba(255, 255, 255, 0.38);
+	}
+</style>
+
+<script>
+	document.querySelectorAll<HTMLElement>('[data-carousel]').forEach((root) => {
+		const slides = Array.from(root.querySelectorAll<HTMLElement>('.carousel-slide'));
+		const dots = Array.from(root.querySelectorAll<HTMLButtonElement>('.dot'));
+		if (slides.length <= 1) return;
+
+		let current = 0;
+
+		function goTo(index: number) {
+			const next = ((index % slides.length) + slides.length) % slides.length;
+
+			slides[current].classList.remove('is-active');
+			slides[current].setAttribute('aria-hidden', 'true');
+			dots[current].classList.remove('is-active');
+			dots[current].setAttribute('aria-selected', 'false');
+
+			current = next;
+
+			slides[current].classList.add('is-active');
+			slides[current].removeAttribute('aria-hidden');
+			dots[current].classList.add('is-active');
+			dots[current].setAttribute('aria-selected', 'true');
+		}
+
+		root.querySelector('.carousel-prev')?.addEventListener('click', () => goTo(current - 1));
+		root.querySelector('.carousel-next')?.addEventListener('click', () => goTo(current + 1));
+		dots.forEach((dot, i) => dot.addEventListener('click', () => goTo(i)));
+
+		// Keyboard
+		root.addEventListener('keydown', (e) => {
+			if (e.key === 'ArrowLeft') {
+				e.preventDefault();
+				goTo(current - 1);
+			} else if (e.key === 'ArrowRight') {
+				e.preventDefault();
+				goTo(current + 1);
+			}
+		});
+
+		// Touch / swipe
+		let startX = 0;
+		let startY = 0;
+		let axis: 'h' | 'v' | null = null;
+
+		root.addEventListener(
+			'touchstart',
+			(e) => {
+				startX = e.touches[0].clientX;
+				startY = e.touches[0].clientY;
+				axis = null;
+			},
+			{ passive: true },
+		);
+
+		root.addEventListener(
+			'touchmove',
+			(e) => {
+				if (axis === null) {
+					const dx = Math.abs(e.touches[0].clientX - startX);
+					const dy = Math.abs(e.touches[0].clientY - startY);
+					if (dx > 4 || dy > 4) axis = dx >= dy ? 'h' : 'v';
+				}
+				if (axis === 'h') e.preventDefault();
+			},
+			{ passive: false },
+		);
+
+		root.addEventListener('touchend', (e) => {
+			if (axis !== 'h') return;
+			const dx = startX - e.changedTouches[0].clientX;
+			if (Math.abs(dx) > 40) goTo(current + (dx > 0 ? 1 : -1));
+			axis = null;
+		});
+	});
+</script>
