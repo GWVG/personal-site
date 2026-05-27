@@ -15,7 +15,9 @@ function isActive(href: string) {
 ---
 
 <nav class="site-nav">
-	<a href="/" class="nav-logo">GW</a>
+	<a href="/" class="nav-logo">
+		<span id="logo-text">GW</span>
+	</a>
 	<ul class="nav-links">
 		{
 			links.map(({ href, label }) => (
@@ -53,10 +55,12 @@ function isActive(href: string) {
 		text-decoration: none;
 		text-transform: uppercase;
 		transition: color 0.2s ease;
+		display: inline-block;
 	}
 
-	.nav-logo:hover {
-		color: var(--accent);
+	#logo-text {
+		min-width: 8.5em;
+		display: inline-block;
 	}
 
 	.nav-links {
@@ -98,3 +102,51 @@ function isActive(href: string) {
 		}
 	}
 </style>
+
+<script>
+	const logoText = document.getElementById('logo-text');
+	const fullName = 'Gert-Willem';
+	const shortName = 'GW';
+	let currentTimeout: ReturnType<typeof setTimeout> | null = null;
+	let currentText = 'GW';
+
+	const randomDelay = (base, variance) => base + (Math.random() * variance * 2) - variance;
+	const logo = document.querySelector('.nav-logo');
+
+	function typeCharacters() {
+		if (currentText.length >= fullName.length) return;
+
+		currentText = fullName.substring(0, currentText.length + 1);
+		logoText!.textContent = currentText;
+
+		currentTimeout = setTimeout(typeCharacters, randomDelay(100, 60));
+	}
+
+	function deleteCharacters() {
+		if (currentText.length <= shortName.length) {
+			currentText = shortName;
+			logoText!.textContent = currentText;
+			currentTimeout = null;
+			return;
+		}
+
+		currentText = currentText.slice(0, -1);
+		logoText!.textContent = currentText;
+
+		currentTimeout = setTimeout(deleteCharacters, randomDelay(80, 30));
+	}
+
+	logo?.addEventListener('mouseenter', () => {
+		if (currentTimeout) clearTimeout(currentTimeout);
+		if (currentText === fullName) return;
+
+		typeCharacters();
+	});
+
+	logo?.addEventListener('mouseleave', () => {
+		if (currentTimeout) clearTimeout(currentTimeout);
+		if (currentText === shortName) return;
+
+		deleteCharacters();
+	});
+</script>
