@@ -127,11 +127,11 @@ const featuredBgSrc =
 	.cursor {
 		display: inline-block;
 		width: 2px;
-		height: 0.8em;
+		height: 0.75em;
 		background: currentColor;
-		vertical-align: text-bottom;
+		vertical-align: 0.05em;
 		animation: blink 0.7s step-start infinite;
-		margin: 0 0.1em;
+		margin-left: 2px;
 	}
 
 	@keyframes blink {
@@ -355,8 +355,7 @@ import { validateEnvVariable } from "astro/env/runtime";
 		const typed = 'Gert-W';
 		const suggestion = 'illem Van Gompel';
 		const deleteText = ' VAN GOMPEL';
-		const typeCharDelay = 150;
-		const backspaceDelay = 80;
+		const randomDelay = (base, variance) => base + (Math.random() * variance * 2) - variance;
 
 		let currentIndex = 0;
 
@@ -365,7 +364,7 @@ import { validateEnvVariable } from "astro/env/runtime";
 			if (currentIndex < typed.length) {
 				typedEl.textContent += typed[currentIndex];
 				currentIndex++;
-				setTimeout(typeNextChar, typeCharDelay);
+				setTimeout(typeNextChar, randomDelay(250, 150));
 			} else {
 				// Move to phase 2 immediately after last char is typed
 				showSuggestionWithTooltip();
@@ -377,7 +376,7 @@ import { validateEnvVariable } from "astro/env/runtime";
 			suggestEl.textContent = suggestion;
 			tooltipEl.classList.add('visible');
 			// Tooltip fades out and suggestion gets accepted
-			setTimeout(acceptSuggestion, 1000);
+			setTimeout(acceptSuggestion, 1300);
 		};
 
 		// Phase 3: Accept suggestion (make it bright)
@@ -390,7 +389,7 @@ import { validateEnvVariable } from "astro/env/runtime";
 				homeNameEl.appendChild(cursorEl);
 			}
 			// Pause with full name visible
-			setTimeout(startBackspace, 2500);
+			setTimeout(startBackspace, 1500);
 		};
 
 		// Phase 4: Backspace " VAN GOMPEL"
@@ -408,7 +407,7 @@ import { validateEnvVariable } from "astro/env/runtime";
 						typedEl.textContent = typedEl.textContent.slice(0, -1);
 					}
 					deleteIndex--;
-					setTimeout(backspaceChar, backspaceDelay);
+					setTimeout(backspaceChar, randomDelay(80, 40));
 				} else {
 					// Backspace complete, hide cursor and fade in tagline
 					cursorEl.style.display = 'none';
