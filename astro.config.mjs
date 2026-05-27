@@ -2,9 +2,7 @@
 
 import mdx from '@astrojs/mdx';
 import netlify from '@astrojs/netlify';
-import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
-import keystatic from '@keystatic/astro';
 import { defineConfig } from 'astro/config';
 import { fileURLToPath } from 'node:url';
 import { rehypeFigure } from './src/plugins/rehype-figure.mjs';
@@ -13,7 +11,7 @@ import { rehypeFigure } from './src/plugins/rehype-figure.mjs';
 export default defineConfig({
 	site: 'https://example.com',
 	adapter: netlify(),
-	integrations: [mdx(), react(), keystatic(), sitemap()],
+	integrations: [mdx(), sitemap()],
 	markdown: {
 		rehypePlugins: [rehypeFigure],
 	},
