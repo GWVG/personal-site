@@ -19,8 +19,16 @@ const featuredBgSrc =
 <BaseLayout title="Gert-Willem van Gompel" description="Engineer. Builder. Rider.">
 	<!-- ─── Hero ─── -->
 	<section class="home-hero">
-		<h1 class="home-name">Gert-Willem</h1>
-		<p class="home-tagline">Engineer.&ensp;Builder.&ensp;Rider.</p>
+		<div class="name-container">
+			<div id="tooltip" class="accept-tooltip">
+				<span class="accept-text">Accept</span>
+				<span class="tab-badge">Tab</span>
+			</div>
+			<h1 class="home-name">
+				<span id="name-typed"></span><span id="name-cursor" class="cursor"></span><span id="name-suggest" class="autocomplete"></span>
+			</h1>
+		</div>
+		<p class="home-tagline" id="tagline">Engineer.&ensp;Builder.&ensp;Rider.</p>
 	</section>
 
 	<!-- ─── Featured travel ─── -->
@@ -98,6 +106,93 @@ const featuredBgSrc =
 		letter-spacing: 0.28em;
 		text-transform: uppercase;
 		color: rgb(var(--gray));
+		opacity: 1;
+		transition: opacity 0.6s ease;
+	}
+
+	.home-tagline.fade-in {
+		animation: fadeInWord 1.2s ease forwards;
+	}
+
+	@keyframes fadeInWord {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+
+	/* ─── Typewriter cursor ─── */
+	.cursor {
+		display: inline-block;
+		width: 2px;
+		height: 0.8em;
+		background: currentColor;
+		vertical-align: text-bottom;
+		animation: blink 0.7s step-start infinite;
+		margin: 0 0.1em;
+	}
+
+	@keyframes blink {
+		50% {
+			opacity: 0;
+		}
+	}
+
+	/* ─── Autocomplete suggestion ─── */
+	.autocomplete {
+		color: #666;
+		font-weight: 400;
+		font-style: italic;
+	}
+
+	.autocomplete.accepted {
+		color: rgb(var(--black));
+		font-style: normal;
+	}
+
+	/* ─── Name container with tooltip ─── */
+	.name-container {
+		position: relative;
+		display: inline-block;
+	}
+
+	.accept-tooltip {
+		position: absolute;
+		top: -3.5rem;
+		left: 50%;
+		transform: translateX(-50%);
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.5rem 0.8rem;
+		background: #1e1e1e;
+		border: 1px solid #444;
+		border-radius: 4px;
+		font-size: 0.75rem;
+		font-weight: 400;
+		color: #aaa;
+		white-space: nowrap;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 0.2s ease;
+		z-index: 10;
+	}
+
+	.accept-tooltip.visible {
+		opacity: 1;
+	}
+
+	.tab-badge {
+		display: inline-block;
+		padding: 0.15rem 0.4rem;
+		background: #2d2d2d;
+		border: 1px solid #555;
+		border-radius: 2px;
+		font-family: ui-monospace, monospace;
+		font-size: 0.65rem;
+		color: #999;
 	}
 
 	/* ─── Featured travel ─── */
@@ -244,3 +339,95 @@ const featuredBgSrc =
 		}
 	}
 </style>
+
+<script>
+import { validateEnvVariable } from "astro/env/runtime";
+
+	function initTypewriter() {
+		const typedEl = document.getElementById('name-typed');
+		const cursorEl = document.getElementById('name-cursor');
+		const suggestEl = document.getElementById('name-suggest');
+		const taglineEl = document.getElementById('tagline');
+		const tooltipEl = document.getElementById('tooltip');
+
+		if (!typedEl || !cursorEl || !suggestEl || !taglineEl || !tooltipEl) return;
+
+		const typed = 'Gert-W';
+		const suggestion = 'illem Van Gompel';
+		const deleteText = ' VAN GOMPEL';
+		const typeCharDelay = 150;
+		const backspaceDelay = 80;
+
+		let currentIndex = 0;
+
+		// Phase 1: Type "Gert-W"
+		const typeNextChar = () => {
+			if (currentIndex < typed.length) {
+				typedEl.textContent += typed[currentIndex];
+				currentIndex++;
+				setTimeout(typeNextChar, typeCharDelay);
+			} else {
+				// Move to phase 2 immediately after last char is typed
+				showSuggestionWithTooltip();
+			}
+		};
+
+		// Phase 2: Show suggestion + tooltip
+		const showSuggestionWithTooltip = () => {
+			suggestEl.textContent = suggestion;
+			tooltipEl.classList.add('visible');
+			// Tooltip fades out and suggestion gets accepted
+			setTimeout(acceptSuggestion, 1000);
+		};
+
+		// Phase 3: Accept suggestion (make it bright)
+		const acceptSuggestion = () => {
+			tooltipEl.classList.remove('visible');
+			suggestEl.classList.add('accepted');
+			// Move cursor to end (after suggestion)
+			const homeNameEl = document.querySelector('.home-name');
+			if (homeNameEl) {
+				homeNameEl.appendChild(cursorEl);
+			}
+			// Pause with full name visible
+			setTimeout(startBackspace, 2500);
+		};
+
+		// Phase 4: Backspace " VAN GOMPEL"
+		const startBackspace = () => {
+			let deleteIndex = deleteText.length - 1;
+
+			const backspaceChar = () => {
+				if (deleteIndex >= 0) {
+					const currentText = typedEl.textContent + suggestEl.textContent;
+					const newText = currentText.slice(0, -1);
+					// Update the appropriate element
+					if (suggestEl.textContent.length > 0) {
+						suggestEl.textContent = suggestEl.textContent.slice(0, -1);
+					} else {
+						typedEl.textContent = typedEl.textContent.slice(0, -1);
+					}
+					deleteIndex--;
+					setTimeout(backspaceChar, backspaceDelay);
+				} else {
+					// Backspace complete, hide cursor and fade in tagline
+					cursorEl.style.display = 'none';
+					setTimeout(() => taglineEl.classList.add('fade-in'), 600);
+				}
+			};
+
+			backspaceChar();
+		};
+
+		// Start the effect
+		typeNextChar();
+	}
+
+	// Run on page load
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', initTypewriter);
+	} else {
+		initTypewriter();
+	}
+
+</script>
