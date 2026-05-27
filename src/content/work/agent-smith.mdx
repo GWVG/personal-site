@@ -1,0 +1,256 @@
+---
+title: "Agent Smith"
+description: "An autonomous code repair agent built from scratch.
+No orchestration libraries. Benchmarked on MBPP and SWE-bench
+across five models and three providers."
+pubDate: 2025-03-01
+stack: ["Python", "LLM", "Docker", "MCP", "SWE-bench"]
+githubUrl: "https://github.com/GWVG/agentic-code-repair"
+---
+
+This was a group project at 42 Belgium, built with
+[svan-den](https://github.com/svan-den). The split: I owned the
+LLM client, orchestrator, prompt engineering, and benchmarking.
+svan-den built the sandbox and the MCP tool servers.
+
+The assignment: build an autonomous code agent from scratch.
+No LangChain, no smolagents, no orchestration libraries. The system
+has to reason about a programming task, write executable Python, run
+it in a sandboxed environment, observe the result, and iterate until
+it solves the problem. You implement the entire loop yourself.
+
+## The two benchmarks
+
+**MBPP** (Mostly Basic Python Problems) is the warm-up. The agent
+gets a function description and a few test cases, writes Python, runs
+the tests, and submits working code. Budget: 10 iterations and 6000
+cumulative input tokens.
+
+**SWE-bench** is the real challenge. The agent receives a GitHub issue
+description, spins up a Docker container with the full repository at
+a specific commit, explores the codebase, finds the bug, applies a
+minimal patch, runs the official test suite, and submits a git diff.
+Real repositories, real bugs. Budget: 30 iterations and 300,000 input
+tokens.
+
+Pass thresholds: 4/5 MBPP tasks and 2/3 SWE-bench tasks, verified
+across three separate evaluation moments.
+
+## Architecture
+
+Five components in a clean layered structure:
+
+```
+CLI entry point
+    └── Orchestrator
+            ├── LLMClient
+            ├── CodeExtractor
+            └── Sandbox
+                    └── MCPClient → MCP Server (tools)
+```
+
+The agent loop is a Thought → Code → Observation cycle. The
+orchestrator sends conversation history to the LLM, receives a
+response containing a Python code block, extracts the code, runs
+it in the sandbox, captures stdout as the observation, appends it
+to history, and repeats.
+
+The loop ends when the LLM calls `final_answer()`, when iteration
+limits are hit, or when the token budget runs out. `final_answer()`
+is not an MCP tool — it is a callable injected directly into the
+sandbox namespace that raises a `_FinalAnswerSignal` exception caught
+by the orchestrator. For SWE-bench, the argument must be
+`get_patch()` — a git diff of all changes made inside the container.
+
+One design decision worth noting: the system uses raw Python code
+blocks as its action language rather than any native function-calling
+API. The LLM writes `print(run_tests(...))` or `edit_file(...)` as
+Python. This makes the system provider-agnostic — any model that can
+produce a valid Python code block works, including open-weights models
+that don't support function calling. The downside is the LLM must
+produce syntactically valid Python, which is why the code extractor
+has five fallback formats.
+
+## The LLM client
+
+A thin wrapper around any OpenAI-compatible API. Provider switching
+requires no code changes — just different CLI flags. The client
+detects the right API key environment variable from the provider URL.
+
+Key rotation runs in two layers. Proactive: after every successful
+request, the key index advances unconditionally — round-robin across
+all available keys. Reactive: on a 429, the current key goes into
+cooldown for the `Retry-After` duration and the next available key
+takes over. Initial selection is randomised so parallel runs don't
+hammer the same key first.
+
+Provider behaviour varies enough that hardcoded values would break
+things. Each provider gets a profile that drives token limits,
+compaction strategy, and retry behaviour. No magic numbers scattered
+through the codebase.
+
+The tightest constraint was Groq's free tier rate limits, which
+effectively capped usable context at around 6000 tokens per request.
+For a multi-turn agent that accumulates conversation history over
+30 iterations, that's extremely tight. The orchestrator handles this
+with history compaction: before every Groq call, it estimates the
+current prompt size and if it exceeds the threshold, it collapses
+older steps to single-line summaries:
+
+```
+Step 2: tool=edit_file, target=/testbed/sympy/core/add.py, result=exit_code=0
+```
+
+Only the most recent observation stays in full. The agent degrades
+gracefully instead of failing with a 413 error.
+
+## Prompt engineering
+
+The SWE-bench system prompt went through several iterations. The
+key insight: the first action must always be `print(run_tests())`.
+Not reading files, not searching, not theorising. The traceback from
+the initial test run gives you the file path, line number, and error
+type. Everything else follows from that.
+
+The other critical constraint: never call `final_answer()` before
+`run_tests()` passes. Models will attempt to submit the moment they
+think they're done. The prompt makes it explicit, and the orchestrator
+enforces it in code — a `final_answer` that doesn't contain actual
+diff markers gets rejected and the loop continues.
+
+Think-block handling was a recurring issue. Reasoning models like
+Qwen3 emit `<think>...</think>` blocks of 300–500 tokens before every
+response. Accumulated over 30 iterations, this consumes the context
+budget fast. The fix: strip think blocks from conversation history
+before sending, while keeping them in logs for analysis.
+
+```python
+def strip_thinking_blocks(text: str) -> str:
+    cleaned = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL)
+    cleaned = re.sub(r"<think>.*", "", cleaned, flags=re.DOTALL)
+    return cleaned.strip()
+```
+
+The system prompt also includes `/no_think` for models that support
+it, which suppresses reasoning traces at the model level. Stripping
+is the code-level safety net for when that doesn't work.
+
+## The orchestrator doesn't trust the agent
+
+One design principle that shaped a lot of decisions: the orchestrator
+verifies everything independently rather than taking the agent's word
+for it.
+
+After every `edit_file` call, the orchestrator automatically runs
+`run_tests()` itself. If the tests pass, it calls
+`final_answer(get_patch())` directly — bypassing the agent entirely.
+The agent doesn't get to declare victory.
+
+There's also contamination detection. A specific failure mode: the
+LLM writes tool output it received directly into the source file
+instead of actual code. The orchestrator reads back every edited file
+and checks for markers like `exit_code=`, `stdout:`, `[TOOL ERROR]`.
+If found, it reverts automatically with `git checkout -- <file>` and
+tells the agent what happened.
+
+```python
+markers = ("exit_code=", "stdout:", "stderr:", "[TOOL ERROR]", ...)
+for mark in markers:
+    if mark in file_text:
+        sandbox.execute(f"print(run_command('git checkout -- {cf}'))")
+```
+
+## Benchmark results
+
+Five models, three providers, three SWE-bench tasks:
+
+| Model | Provider | django | xarray | sympy | Pass |
+|-------|----------|--------|--------|-------|------|
+| qwen3-32b | Groq | ✅ i6 | ❌ i30 | ✅ i1 | 2/3 |
+| ling-2.6-1t | OpenRouter | ❌ i22 | ✅ i4 | ✅ i3 | 2/3 |
+| llama-3.3-70b | Groq | ✅ i23 | ❌ i30 | ✅ i6 | 2/3 |
+| llama-4-scout-17b | Groq | ✅ i26 | ✅ i22 | ❌ i30 | 2/3 |
+| gemini-flash-lite | Google | ❌ i1 | ❌ i15 | ❌ i12 | 0/3 |
+
+Provider latency across all runs:
+
+| Provider | Avg latency/request |
+|----------|--------------------:|
+| Groq | 641ms |
+| OpenRouter | 3428ms |
+| Google | 15855ms |
+
+In our runs, Groq averaged 641ms per request versus 15855ms for
+Google — roughly 25× faster. Over 30 iterations that compounds into
+minutes of difference in wall-clock time.
+
+The exam runs consistently scored 5/6 using qwen3-32b on Groq. The
+one persistent failure was sympy__sympy-14711, which failed on every
+attempt across all models and providers.
+
+## What failed
+
+**Silent sandbox failures.** Early versions swallowed exceptions
+without feedback. The LLM would call a tool, get no output, and
+hallucinate that it had succeeded. The fix: explicit feedback strings
+for every failure mode — `[IMPORT BLOCKED]`, `[PATH RESTRICTED]`,
+`[TIMEOUT after Xs]`. Never leave the model guessing.
+
+**The import-outside-candidate-code bug.** MBPP tasks failed
+correctness even when the agent reported success. The agent was
+writing `import re` outside the `candidate_code` string. The local
+`run_tests()` could see the import, but the moulinette evaluating
+the submitted string standalone couldn't. Required both a prompt
+change and a note in the sandbox documentation.
+
+**edit_file ambiguity.** The string `"    def get_params(self, deep=True):"`
+appears in both `Pipeline` and `FeatureUnion` in sklearn's pipeline.py.
+`edit_file` raised `"expected exactly one match, got 2"` and the agent
+got stuck retrying the same edit. Fixed with better error messages
+that tell the model to add surrounding context lines to make the
+match unique.
+
+**False positives from run_tests().** The SWE-bench eval script runs
+git and pip operations before pytest. Early versions returned the full
+output including 80 lines of install noise. The model saw
+`Successfully installed` and sometimes concluded the tests had passed.
+Fixed by trimming output to start from the first meaningful pytest
+line.
+
+## On evaluation and luck
+
+The pass thresholds — 2/3 SWE-bench tasks across three evaluation
+moments — sound straightforward. The statistics tell a different story.
+
+The [SWE-bench leaderboard](https://www.swebench.com/) is a useful
+reference point. As of mid-2026, Claude Opus 4.6 sits at 75.6% — one
+of the top scores on the board, on a paid commercial model. The
+probability of passing at least 2 out of 3 tasks at that success rate:
+
+```
+P(≥ 2/3) = C(3,2) × 0.756² × 0.244 + 0.756³ ≈ 0.85
+```
+
+Across three consecutive evaluation moments:
+
+```
+P(3× in a row) = 0.85³ ≈ 61%
+```
+
+The best available paid model misses the bar about 4 times in 10.
+And that's without rate limits, token budget constraints, or the
+variance introduced by running on free-tier APIs.
+
+A run that passed on Tuesday could fail on Wednesday not because the
+agent changed, but because available API quota was lower and the
+iteration budget ran out before the agent found the solution. At one
+point we exhausted our limits badly enough that we tried creating
+additional accounts to distribute API calls. Groq detected this
+quickly and blocked everything. I contacted them directly, explained
+the situation, and they restored access on the condition we respect
+their terms of use.
+
+The practical lesson: when you're building on probabilistic systems,
+the reliability of your evaluation method matters as much as the
+quality of the system. A benchmark score is a distribution, not a
+number.
