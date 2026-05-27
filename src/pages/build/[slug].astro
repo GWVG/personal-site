@@ -1,0 +1,123 @@
+---
+import { type CollectionEntry, getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+	const projects = await getCollection('build');
+	return projects.map((project) => ({
+		params: { slug: project.id },
+		props: project,
+	}));
+}
+
+type Props = CollectionEntry<'build'>;
+
+const project = Astro.props;
+const { title, description, status } = project.data;
+const { Content } = await render(project);
+---
+
+<BaseLayout title={title} description={description}>
+	<main class="build-post">
+		<article>
+			<header class="post-header">
+				<h1 class="post-title">{title}</h1>
+				<div class="post-meta">
+					<span class="status" data-status={status}>
+						{status === 'ongoing' ? 'Ongoing' : 'Completed'}
+					</span>
+				</div>
+				<p class="post-desc">{description}</p>
+				<hr class="header-rule" />
+			</header>
+			<div class="prose">
+				<Content />
+			</div>
+		</article>
+	</main>
+</BaseLayout>
+
+<style>
+	.build-post {
+		width: 720px;
+		max-width: calc(100% - 2em);
+		margin: 0 auto;
+		padding: calc(var(--nav-h) + 3.5em) 1em 5em;
+	}
+
+	/* ─── Header ─── */
+	.post-header {
+		margin-bottom: 3rem;
+	}
+
+	.post-title {
+		font-family: var(--font-display);
+		font-size: clamp(2rem, 5vw, 3.5rem);
+		font-weight: 700;
+		color: rgb(var(--black));
+		margin: 0 0 1rem;
+		line-height: 1.05;
+		text-transform: uppercase;
+		letter-spacing: 0.02em;
+	}
+
+	.post-meta {
+		margin-bottom: 1.25rem;
+	}
+
+	/* ─── Status badge ─── */
+	.status {
+		display: inline-block;
+		padding: 0.25rem 0.6rem;
+		border-radius: 2px;
+		background: rgb(var(--gray-light));
+		font-size: 0.68rem;
+		font-weight: 400;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		color: rgb(var(--gray));
+	}
+
+	.status[data-status='ongoing'] {
+		color: var(--accent);
+		background: rgba(201, 169, 110, 0.1);
+	}
+
+	/* ─── Description ─── */
+	.post-desc {
+		font-size: 1rem;
+		font-weight: 300;
+		color: rgb(var(--gray));
+		line-height: 1.6;
+		margin: 0;
+	}
+
+	.header-rule {
+		margin-top: 2rem;
+		border: none;
+		border-top: 1px solid rgb(var(--gray-light));
+	}
+
+	/* ─── Prose ─── */
+	.prose {
+		font-size: 1rem;
+	}
+
+	/* ─── code font in prose ─── */
+	:global(.prose code) {
+		font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, monospace;
+		font-size: 0.85em;
+	}
+
+	/* ─── fenced code block ─── */
+	:global(.prose pre code) {
+		font-size: 0.82rem;
+		line-height: 1.65;
+	}
+
+	@media (max-width: 480px) {
+		.build-post {
+			padding: calc(var(--nav-h) + 2rem) 1rem 3rem;
+		}
+	}
+</style>

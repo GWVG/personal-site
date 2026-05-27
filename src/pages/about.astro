@@ -1,63 +1,71 @@
 ---
-import AboutHeroImage from '../assets/blog-placeholder-about.jpg';
-import Layout from '../layouts/BlogPost.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<Layout
-	title="About Me"
-	description="Lorem ipsum dolor sit amet"
-	pubDate={new Date('August 08 2021')}
-	heroImage={AboutHeroImage}
->
-	<p>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-		labore et dolore magna aliqua. Vitae ultricies leo integer malesuada nunc vel risus commodo
-		viverra. Adipiscing enim eu turpis egestas pretium. Euismod elementum nisi quis eleifend quam
-		adipiscing. In hac habitasse platea dictumst vestibulum. Sagittis purus sit amet volutpat. Netus
-		et malesuada fames ac turpis egestas. Eget magna fermentum iaculis eu non diam phasellus
-		vestibulum lorem. Varius sit amet mattis vulputate enim. Habitasse platea dictumst quisque
-		sagittis. Integer quis auctor elit sed vulputate mi. Dictumst quisque sagittis purus sit amet.
-	</p>
+<BaseLayout title="About" description="More about Gert-Willem van Gompel.">
+	<main class="about-page">
+		<h1 class="about-title">Gert-Willem</h1>
+		<article class="about-content">
 
-	<p>
-		Morbi tristique senectus et netus. Id semper risus in hendrerit gravida rutrum quisque non
-		tellus. Habitasse platea dictumst quisque sagittis purus sit amet. Tellus molestie nunc non
-		blandit massa. Cursus vitae congue mauris rhoncus. Accumsan tortor posuere ac ut. Fringilla urna
-		porttitor rhoncus dolor. Elit ullamcorper dignissim cras tincidunt lobortis. In cursus turpis
-		massa tincidunt dui ut ornare lectus. Integer feugiat scelerisque varius morbi enim nunc.
-		Bibendum neque egestas congue quisque egestas diam. Cras ornare arcu dui vivamus arcu felis
-		bibendum. Dignissim suspendisse in est ante in nibh mauris. Sed tempus urna et pharetra pharetra
-		massa massa ultricies mi.
-	</p>
+			<p>For most of my career I designed buildings. Residential projects — from first client meeting through permit applications and site supervision. I liked the work, and I was drawn to the technical side of it: matching what a client wanted with what regulations and physics would actually allow, finding solutions for details that had to work on every level simultaneously.</p>
 
-	<p>
-		Mollis nunc sed id semper risus in. Convallis a cras semper auctor neque. Diam sit amet nisl
-		suscipit. Lacus viverra vitae congue eu consequat ac felis donec. Egestas integer eget aliquet
-		nibh praesent tristique magna sit amet. Eget magna fermentum iaculis eu non diam. In vitae
-		turpis massa sed elementum. Tristique et egestas quis ipsum suspendisse ultrices. Eget lorem
-		dolor sed viverra ipsum. Vel turpis nunc eget lorem dolor sed viverra. Posuere ac ut consequat
-		semper viverra nam. Laoreet suspendisse interdum consectetur libero id faucibus. Diam phasellus
-		vestibulum lorem sed risus ultricies tristique. Rhoncus dolor purus non enim praesent elementum
-		facilisis. Ultrices tincidunt arcu non sodales neque. Tempus egestas sed sed risus pretium quam
-		vulputate. Viverra suspendisse potenti nullam ac tortor vitae purus faucibus ornare. Fringilla
-		urna porttitor rhoncus dolor purus non. Amet dictum sit amet justo donec enim.
-	</p>
+			<p>What frustrated me was how much potential the tools had, and how little of it got used. Colleagues drawing a rectangle for each wall instead of using the built-in wall object. BIM workflows that could have automated half the documentation, sitting unused. At the scale of the offices I worked in, nobody had made the time to set it up properly — so eventually I did.</p>
 
-	<p>
-		Mattis ullamcorper velit sed ullamcorper morbi tincidunt. Tortor posuere ac ut consequat semper
-		viverra. Tellus mauris a diam maecenas sed enim ut sem viverra. Venenatis urna cursus eget nunc
-		scelerisque viverra mauris in. Arcu ac tortor dignissim convallis aenean et tortor at. Curabitur
-		gravida arcu ac tortor dignissim convallis aenean et tortor. Egestas tellus rutrum tellus
-		pellentesque eu. Fusce ut placerat orci nulla pellentesque dignissim enim sit amet. Ut enim
-		blandit volutpat maecenas volutpat blandit aliquam etiam. Id donec ultrices tincidunt arcu. Id
-		cursus metus aliquam eleifend mi.
-	</p>
+			<p>That pattern kept repeating — and gradually expanding. What started as optimising my own project workflow shifted toward rethinking how the office itself operated. Sales process, incoming prospects, the administrative overhead around it all. Technically that was someone else's job — my boss handled sales, a part-time secretary came in once a week. By the time the automations were running, she was down to a few hours. This was before anyone was dramatically screaming about AI replacing jobs. I did it without AI — mostly just repetitive copy-paste work that turned out to be trivially automatable with the right tools.</p>
 
-	<p>
-		Tempus quam pellentesque nec nam aliquam sem. Risus at ultrices mi tempus imperdiet. Id porta
-		nibh venenatis cras sed felis eget velit. Ipsum a arcu cursus vitae. Facilisis magna etiam
-		tempor orci eu lobortis elementum. Tincidunt dui ut ornare lectus sit. Quisque non tellus orci
-		ac. Blandit libero volutpat sed cras. Nec tincidunt praesent semper feugiat nibh sed pulvinar
-		proin gravida. Egestas integer eget aliquet nibh praesent tristique magna.
-	</p>
-</Layout>
+			<p>In the summer of 2025 I quit my job and took the entrance exam for 42 Belgium — four weeks, intensive, ended with an 84% on the final Piscine exam. I got in! I started the Common Core in October. A few weeks later, 42 changed the curriculum: Python was added, and there was more focus on AI. Good timing.</p>
+
+			<p>Seven months later: C, Python, Rust, LLMs, a multiplayer TCP server, an autonomous code repair agent. Peer review that forces you to actually understand what you wrote. No teachers, no lectures, no hiding behind vague answers.</p>
+
+			<p>I'm now looking for a role where I can keep building. Where the work is technically interesting and the problems are real.</p>
+
+			<p>Outside of work: motorcycles, travel, an ongoing interest in how things are built — physically, digitally, systemically.</p>
+
+			<p class="status-line">
+				Currently looking for work in software and ML engineering.
+			</p>
+		</article>
+	</main>
+</BaseLayout>
+
+<style>
+	.about-page {
+		width: 100%;
+		padding: calc(var(--nav-h) + 4em) 1em 6em;
+	}
+
+	.about-title {
+		font-family: var(--font-display);
+		font-size: clamp(2.5rem, 6vw, 4rem);
+		font-weight: 700;
+		color: rgb(var(--black));
+		margin: 0 0 3rem;
+		text-transform: uppercase;
+		letter-spacing: 0.02em;
+		line-height: 1.05;
+		text-align: center;
+	}
+
+	.about-content {
+		width: 680px;
+		max-width: calc(100% - 2em);
+		margin: 0 auto;
+		font-size: 1rem;
+		line-height: 1.75;
+		color: rgb(var(--gray-dark));
+	}
+
+	.about-content p {
+		margin: 0 0 1.75em;
+	}
+
+	.status-line {
+		margin-top: 3em !important;
+		padding-top: 2em;
+		border-top: 1px solid rgb(var(--gray-light));
+		font-size: 0.9rem;
+		font-weight: 300;
+		color: rgb(var(--gray));
+		letter-spacing: 0.03em;
+	}
+</style>
