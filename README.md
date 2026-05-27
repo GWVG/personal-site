@@ -1,13 +1,12 @@
 # Personal Site
 
-Personal website built with Astro, Keystatic CMS, and deployed
+Personal website built with Astro and deployed
 on Netlify. Features a travel section with photo galleries,
 technical project write-ups, and a build log of physical projects.
 
 ## Stack
 
 - **Astro 6** — static site generator
-- **Keystatic** — git-based CMS for content management
 - **Netlify** — hosting and deployment
 - **DM Sans + Oswald** — typography
 

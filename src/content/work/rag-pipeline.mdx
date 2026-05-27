@@ -1,0 +1,131 @@
+---
+title: "RAG Against the Machine"
+description: "A retrieval-augmented generation pipeline over the vLLM
+codebase. BM25 retrieval, local Qwen3-0.6B inference, 86% Recall@5
+on documentation."
+pubDate: 2026-05-27
+stack: ["Python", "BM25", "Qwen3-0.6B", "Pydantic", "PyTorch"]
+githubUrl: "https://github.com/GWVG/codebase-rag-pipeline"
+---
+
+This was a project at 42 Belgium. The goal: build a system that can
+answer questions about a large codebase using only local models,
+no cloud APIs.
+
+RAG stands for Retrieval-Augmented Generation. The idea is simple:
+instead of asking a language model to answer from memory, you first
+retrieve relevant pieces of text from a corpus, then feed those as
+context to the model. The quality of the answer depends almost
+entirely on the quality of the retrieval step.
+
+## The Problem
+
+The corpus was the vLLM codebase - about 2000 files across Python
+source and text-based documentation files (Markdown, RST, and others). The system had to index it, then answer arbitrary questions
+about it using a 0.6B parameter model running locally. Hard
+constraints: indexing under 5 minutes, index load time under 60
+seconds, 1000 queries in under 90 seconds, each answer within
+2 seconds. Tested on an M1 Pro, no external GPU.
+
+## Architecture
+
+Four stages, each in its own module:
+
+```
+vLLM repo (raw files)
+    → ingestion     file discovery, chunking, serialization
+    → retrieval     BM25 index build and search
+    → generation    Qwen3-0.6B prompt construction and inference
+    → CLI           Python Fire wiring it all together
+```
+
+Pydantic models flow through every boundary. The CLI contract
+matches the autograder exactly: `python -m student index`,
+`search_dataset`, `evaluate`, `answer_dataset`.
+
+## Why BM25
+
+The subject offered two options: TF-IDF or BM25.
+
+TF-IDF scores by term frequency but ignores document length. A long
+file scores higher simply because it has more words.
+
+BM25 fixes this with two parameters: a saturation cap that limits
+how much repeated terms help, and a length normalization relative
+to the corpus average. For a codebase it's actually the stronger
+choice: code has precise vocabulary. A query about `PagedAttention`
+contains exactly the token that appears in the source. Exact match
+works better here than semantic similarity would.
+
+## Chunking
+
+The chunking strategy has more impact on results than anything
+in the retrieval step. The index can only find what the chunker
+preserved.
+
+Two strategies by file type:
+
+**Python files** - split on `class` and `def` prefixes. Functions
+and classes stay intact as natural units. A query about a specific
+function lands in a chunk that contains that function, not a window
+that starts halfway through it.
+
+**Text files (Markdown, RST, and others)** - split on heading levels. The splitter tracks
+code fences and suppresses splits inside them, so a heading inside
+a code example doesn't break its surrounding chunk.
+
+Both strategies cap at 2000 characters. Oversized segments get
+fixed-size windows rather than being dropped.
+
+One thing I tested: adding more split prefixes to get finer-grained
+chunks. It didn't help. More splits means smaller chunks means less
+context per retrieved result. There's a floor below which chunking
+starts hurting recall.
+
+## Results
+
+| Dataset | Recall@1 | Recall@3 | Recall@5 | Recall@10 |
+|---------|----------|----------|----------|-----------|
+| Docs    | 0.55     | 0.80     | **0.86** | 0.90      |
+| Code    | 0.31     | 0.45     | **0.48** | 0.59      |
+
+Requirements were 55% docs and 45% code at Recall@5. Both cleared
+the bar, but the gap is significant.
+
+Documentation questions tend to use the same words as the
+documentation itself. BM25 handles this well. Code questions often
+describe behavior in natural language that doesn't appear verbatim
+in source - "how does vLLM handle memory allocation?" might be
+answered by code that never uses the word "allocation". That's the
+known ceiling of lexical search.
+
+## Decisions That Mattered
+
+**`enable_thinking=False`** - Qwen3 has a built-in reasoning mode
+that outputs visible chain-of-thought before answering. Useful for
+complex reasoning, not useful here. Without this flag the model
+writes paragraphs of thinking before the actual answer, which blows
+the 2-second limit. One line fixed it.
+
+**`torch.inference_mode()`** over `torch.no_grad()` - inference mode
+disables gradient tracking entirely, not just gradient computation.
+On M1 this brought generation time from 2.16s/question to
+1.36s/question.
+
+**Context length of 512 characters** - reducing from the default
+2000 characters. BM25 already ranks the best chunks first, so the
+signal is at the top. Shorter context means fewer tokens fed to the
+model, which is the main bottleneck at this scale.
+
+**Interface contracts** - the autograder validates JSON field names
+and command signatures exactly. A working system that outputs
+`question_str` instead of `question` scores zero. I hit this.
+
+## What I Took Away
+
+Retrieval quality is decided at chunking time, not at query time.
+BM25 with good chunking beats naive approaches convincingly - 86%
+Recall@5 with no ML and no GPU. Small models are bottlenecked by
+prompt quality and context relevance, not by their size. And the
+interface between your system and its evaluator matters as much as
+the system itself.

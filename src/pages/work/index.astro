@@ -1,0 +1,142 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+
+const projects = (await getCollection('work')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+---
+
+<BaseLayout title="Work" description="Technical projects and engineering work.">
+	<main class="work-index">
+		<ul class="project-list">
+			{
+				projects.map((project) => (
+					<li>
+						<a href={`/work/${project.id}/`} class="project-card">
+							<div class="card-body">
+								<h2 class="card-title">{project.data.title}</h2>
+								<p class="card-desc">{project.data.description}</p>
+							</div>
+							<div class="card-footer">
+								<ul class="stack-tags" aria-label="Stack">
+									{project.data.stack.map((tag) => (
+										<li class="stack-tag">{tag}</li>
+									))}
+								</ul>
+								{project.data.githubUrl && (
+									<span class="github-hint">GitHub ↗</span>
+								)}
+							</div>
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</main>
+</BaseLayout>
+
+<style>
+	.work-index {
+		width: 720px;
+		max-width: calc(100% - 2em);
+		margin: 0 auto;
+		padding: calc(var(--nav-h) + 3em) 1em 4em;
+	}
+
+	.project-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 1px;
+		background: rgb(var(--gray-light));
+		border: 1px solid rgb(var(--gray-light));
+	}
+
+	.project-card {
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
+		padding: 2rem;
+		background: #0f0f0f;
+		text-decoration: none;
+		color: inherit;
+		transition: background 0.18s ease;
+	}
+
+	.project-card:hover {
+		background: #111;
+	}
+
+	.card-title {
+		font-size: 1.25rem;
+		font-weight: 600;
+		color: rgb(var(--black));
+		margin: 0 0 0.5rem;
+		line-height: 1.25;
+		transition: color 0.18s ease;
+	}
+
+	.project-card:hover .card-title {
+		color: var(--accent);
+	}
+
+	.card-desc {
+		margin: 0;
+		font-size: 0.92rem;
+		color: rgb(var(--gray-dark));
+		line-height: 1.55;
+		font-weight: 400;
+	}
+
+	.card-footer {
+		display: flex;
+		align-items: center;
+		gap: 1.25rem;
+		flex-wrap: wrap;
+	}
+
+	/* ─── Stack tags ─── */
+	.stack-tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.stack-tag {
+		font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, monospace;
+		font-size: 0.68rem;
+		font-weight: 400;
+		letter-spacing: 0.04em;
+		color: rgb(var(--gray));
+		background: rgb(var(--gray-light));
+		border: 1px solid rgba(255, 255, 255, 0.06);
+		padding: 0.2rem 0.55rem;
+		border-radius: 2px;
+	}
+
+	.github-hint {
+		font-size: 0.72rem;
+		font-weight: 500;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+		color: rgb(var(--gray));
+		margin-left: auto;
+	}
+
+	@media (max-width: 480px) {
+		.project-card {
+			padding: 1.5rem;
+		}
+
+		.github-hint {
+			margin-left: 0;
+		}
+	}
+</style>
