@@ -26,8 +26,9 @@ const { images } = Astro.props;
 
 <style>
 	.photo-row {
-		display: flex;
-		gap: 3px;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+		gap: 12px;
 		margin: 2.5rem 0;
 	}
 	.photo-row-item {
@@ -52,8 +53,8 @@ const { images } = Astro.props;
 	}
 	@media (max-width: 640px) {
 		.photo-row {
-			flex-direction: column;
-			gap: 3px;
+			grid-template-columns: 1fr;
+			gap: 12px;
 		}
 		.photo-row-item img {
 			height: auto;
