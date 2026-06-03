@@ -9,7 +9,7 @@ import { rehypeFigure } from './src/plugins/rehype-figure.mjs';
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://example.com',
+	site: 'https://gert-willem.netlify.app',
 	adapter: netlify(),
 	integrations: [mdx(), sitemap()],
 	markdown: {
