@@ -1,0 +1,86 @@
+---
+import { Image, type ImageMetadata } from 'astro:assets';
+
+interface Props {
+	landscape?: ImageMetadata;
+	landscapeAlt?: string;
+	portrait1: ImageMetadata;
+	portrait2: ImageMetadata;
+	portrait1Alt: string;
+	portrait2Alt: string;
+	caption?: string;
+}
+
+const { landscape, portrait1, portrait2, landscapeAlt, portrait1Alt, portrait2Alt, caption } = Astro.props;
+---
+
+<div class="photo-group">
+	{landscape && (
+		<div class="photo-group-top">
+			<Image
+				src={landscape}
+				alt={landscapeAlt ?? ''}
+				widths={[600, 900, 1200]}
+				sizes="(max-width: 720px) 100vw, 720px"
+			/>
+		</div>
+	)}
+	<div class="photo-group-bottom">
+		<Image
+			src={portrait1}
+			alt={portrait1Alt}
+			widths={[300, 450, 600]}
+			sizes="(max-width: 720px) 100vw, 50vw"
+		/>
+		<Image
+			src={portrait2}
+			alt={portrait2Alt}
+			widths={[300, 450, 600]}
+			sizes="(max-width: 720px) 100vw, 50vw"
+		/>
+	</div>
+	{caption && <p class="photo-group-caption">{caption}</p>}
+</div>
+
+<style>
+	.photo-group {
+		display: grid;
+		gap: 30px;
+		margin: 2.5rem 0;
+	}
+
+	.photo-group-top {
+		width: 100%;
+	}
+
+	.photo-group-bottom {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 30px;
+	}
+
+	.photo-group-top img {
+		width: 100%;
+		height: auto;
+		display: block;
+		border-radius: 0;
+	}
+
+	.photo-group-bottom img {
+		width: 100%;
+		height: auto;
+		display: block;
+		border-radius: 0;
+		aspect-ratio: 3 / 4;
+ 		object-fit: cover;
+	}
+
+	.photo-group-caption {
+		font-size: 0.75rem;
+		color: rgba(255, 255, 255, 0.4);
+		margin-top: 0.5rem;
+		font-family: var(--font-body, 'DM Sans', sans-serif);
+		letter-spacing: 0.02em;
+		margin-bottom: 0;
+	}
+</style>

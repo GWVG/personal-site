@@ -14,6 +14,7 @@
 	--gray: 110, 108, 102;
 	--gray-light: 30, 28, 26;
 	--gray-dark: 200, 197, 190;
+	--text-color: #e0e0e0;
 	--gray-gradient: rgba(15, 15, 15, 50%), #0f0f0f;
 	--box-shadow:
 		0 2px 6px rgba(0, 0, 0, 60%), 0 8px 24px rgba(0, 0, 0, 50%),
@@ -22,15 +23,15 @@
 
 body {
 	font-family: var(--font-body);
-	font-weight: 400;
+	font-weight: 300;
 	margin: 0;
 	padding: 0;
 	text-align: left;
 	background: #0f0f0f;
 	word-wrap: break-word;
 	overflow-wrap: break-word;
-	color: rgb(var(--gray-dark));
-	font-size: 20px;
+	color: var(--text-color);
+	font-size: 1rem;
 	line-height: 1.6;
 }
 
@@ -58,7 +59,7 @@ h1 {
 }
 
 h2 {
-	font-size: 2.441em;
+	font-size: clamp(1.4rem, 2.8vw, 2rem);
 	font-weight: 600;
 }
 

@@ -10,8 +10,10 @@ distance: 2650
 ---
 
 import { Image } from 'astro:assets';
-import PhotoRow from '../../components/PhotoRow.astro';
+import InlinePhoto from '../../components/InlinePhoto.astro';
 import PhotoCarousel from '../../components/PhotoCarousel.astro';
+import PhotoRow from '../../components/PhotoRow.astro';
+import PhotoGroup from '../../components/PhotoGroup.astro';
 
 {/* Part 1 */}
 import imgFerry from '../../assets/images/travel/single-malt-roads/part1/ferry.jpg';
@@ -42,13 +44,20 @@ import imgRiverDionard from '../../assets/images/travel/single-malt-roads/nothin
 {/* Part 5 */}
 import imgKyleskuBridge from '../../assets/images/travel/single-malt-roads/part5/kylesku-bridge.jpg';
 import imgSmooCaveInside from '../../assets/images/travel/single-malt-roads/part5/smoo-cave-inside.jpg';
-import imgLochTorridon from '../../assets/images/travel/single-malt-roads/part5/loch-torridon.jpg';
 import imgUllapoolStreet from '../../assets/images/travel/single-malt-roads/part5/ullapool-street.jpg';
+import imgSmooCaveOutside from '../../assets/images/travel/single-malt-roads/part5/smoo-cave-outside.jpg';
+import imgSutherland from '../../assets/images/travel/single-malt-roads/part5/sutherland.jpg';
+import imgUllapoolWater from '../../assets/images/travel/single-malt-roads/part5/ullapool-water.jpg';
+
 
 {/* Between 5 and Bealach */}
+import imgLochTorridon from '../../assets/images/travel/single-malt-roads/between-part-5-and-baelachnaba/loch-torridon.jpg';
 import imgDundonnellRiver from '../../assets/images/travel/single-malt-roads/between-part-5-and-baelachnaba/dundonnell-river.jpg';
 import imgLittleLochBroomBike from '../../assets/images/travel/single-malt-roads/between-part-5-and-baelachnaba/little-loch-broom-bike.jpg';
 import imgLochTollaidhBike from '../../assets/images/travel/single-malt-roads/between-part-5-and-baelachnaba/loch-tollaidh-bike.jpg';
+
+import imgArdvreckCastle from '../../assets/images/travel/single-malt-roads/ardvreck/ardvreck-castle.jpg';
+import imgArdvreckRoad from '../../assets/images/travel/single-malt-roads/ardvreck/ardvreck-road.jpg';
 
 {/* Bealach na Bà */}
 import imgBealachNaBa from '../../assets/images/travel/single-malt-roads/baelachnaba/baelach-na-ba.jpg';
@@ -58,13 +67,15 @@ import imgBealachGuzzi from '../../assets/images/travel/single-malt-roads/baelac
 
 {/* Part 6 */}
 import imgLochEtiveRock from '../../assets/images/travel/single-malt-roads/part6/loch-etive-rock.jpg';
+import imgLochEtiveTree from '../../assets/images/travel/single-malt-roads/part6/loch-etive-tree.jpg';
+import imgWetsuit from '../../assets/images/travel/single-malt-roads/part6/wetsuit.jpg';
+
 import imgThreeSisters from '../../assets/images/travel/single-malt-roads/part6/2-of-the-3-sisters.jpg';
+import imgHappyNessie from '../../assets/images/travel/single-malt-roads/part6/happy-nessie.jpg';
+
 import imgGlasgow from '../../assets/images/travel/single-malt-roads/part6/glasgow.jpg';
 import imgRiversideMuseumInside from '../../assets/images/travel/single-malt-roads/part6/riverside-museum-inside.jpg';
-import imgArdvreckCastle from '../../assets/images/travel/single-malt-roads/part6/ardvreck-castle.jpg';
-import imgArdvreckRoad from '../../assets/images/travel/single-malt-roads/part6/ardvreck-road.jpg';
-import imgHappyNessie from '../../assets/images/travel/single-malt-roads/part6/happy-nessie.jpg';
-import imgWetsuit from '../../assets/images/travel/single-malt-roads/part6/wetsuit.jpg';
+import imgRiversideMuseumOutside from '../../assets/images/travel/single-malt-roads/part6/riverside-museum-outside.jpg';
 
 ---
 
@@ -77,9 +88,10 @@ The ride to IJmuiden was unremarkable by design. You don't sightsee on day one; 
 The cabin on the King Seaways was small, windowless, and equipped with a stacked bunk that left no one in doubt about the vessel's priorities. We spent most of the crossing on the observation deck at the bow, watching the North Sea do its thing, which that evening happened to involve a genuinely beautiful sunset. You take what you get.
 
 <PhotoCarousel
+  aspect="4/3"
   images={[
-    { src: imgNorthSea, alt: "Sunset over the North Sea" },
-    { src: imgFerry, alt: "On board the King Seaways" },
+    { src: imgNorthSea, alt: "The North Sea between IJmuiden and Newcastle", caption: "The North Sea, somewhere between IJmuiden and Newcastle." },
+    { src: imgFerry, alt: "On board the King Seaways", caption: "The King Seaways tracks its wildlife sightings along the route. Harbour porpoise, minke whale, unidentified dolphin. The North Sea, apparently, is busier than it looks." },
   ]}
 />
 
@@ -91,22 +103,17 @@ The English coast appeared the next morning. Nobody on deck shouted anything nau
 
 From Newcastle we rode north through Northumberland — rolling, impossibly green, the kind of landscape where Teletubbies would live contentedly in their hills. At the Scottish border, someone has placed a large rock with the word "Scotland" on it, presumably for those who missed the road signs. We stopped for the obligatory photograph, taken by a fellow motorcyclist—a Brit who was visibly envious when we told him we were riding all the way north.
 
-<figure class="travel-photo travel-photo--single">
-  <Image src={imgScotlandBorderRock} alt="Scotland border stone" widths={[800, 1200, 1600]} sizes="(max-width: 720px) 100vw, 720px" />
-</figure>
-
 Jedburgh came next, and its abbey graveyard was atmospheric enough that I found myself half-expecting Peter Pettigrew to appear from behind a headstone, cradling the remnants of you-know-who. It was a beautiful sunny day. This did not make the graveyard less Gothic.
-
-<figure class="travel-photo travel-photo--single">
-  <Image src={imgJedburghAbbey} alt="Jedburgh Abbey graveyard" widths={[800, 1200, 1600]} sizes="(max-width: 720px) 100vw, 720px" />
-</figure>
 
 At the Forth Bridge near Queensferry we ran into the Dutch motorcycling couple we'd spoken with on the ferry that same morning. The world, as it reliably turns out, is small. After a brief stop at the Kelpies — two thirty-metre steel horse heads rising from the Falkirk flatlands with the quiet confidence of public art that has thoroughly earned its place — we checked into our hotel in Grangemouth.
 
-<PhotoRow
+<PhotoCarousel
+  aspect="1/1"
   images={[
-    { src: imgQueensferry },
-    { src: imgKelpies },
+    { src: imgQueensferry, alt: "The Forth Bridge at Queensferry", caption: "The Forth Bridge at Queensferry — a decent reason to stop." },
+    { src: imgScotlandBorderRock, alt: "The Scottish border stone", caption: "The Scottish border. The sign is a rock." },
+    { src: imgJedburghAbbey, alt: "Jedburgh Abbey graveyard", caption: "Jedburgh Abbey graveyard. Beautiful day. Somehow still Gothic." },
+    { src: imgKelpies, alt: "The Kelpies, Falkirk", caption: "The Kelpies, Falkirk. Thirty metres of steel horse, rising from a flatland." },
   ]}
 />
 
@@ -116,24 +123,27 @@ At the Forth Bridge near Queensferry we ran into the Dutch motorcycling couple w
 
 Day three brought 298 kilometres and a lesson in Scottish meteorological irony: as the landscape became progressively more interesting, the weather became progressively less cooperative. The moors around Cairngorms National Park were rendered in a grey that was, admittedly, very on-brand for the location. It was, as we would come to understand, merely a preview.
 
-<PhotoCarousel
-  images={[
-    { src: imgCairngorms, alt: "Cairngorms National Park in grey mist" },
-    { src: imgRoadToFortAugustus, alt: "Road toward Fort Augustus" },
-  ]}
+<InlinePhoto
+  src={imgCairngorms}
+  alt="Cairngorms National Park, day three"
+  caption="Cairngorms National Park, day three."
 />
 
 We arrived at our B&B in Grantown-on-Spey and were permitted to park the motorcycles in the owner's shed, next to his tractor. This felt appropriate. Scotland operates at its own scale of machinery.
 
-<figure class="travel-photo travel-photo--single">
-  <Image src={imgGrantownTractor} alt="Motorcycles parked beside a tractor" widths={[800, 1200, 1600]} sizes="(max-width: 720px) 100vw, 720px" />
-</figure>
+<PhotoCarousel
+  aspect="4/3"
+  images={[
+    { src: imgRoadToFortAugustus, alt: "The road to Fort Augustus",
+      caption: "The road to Fort Augustus." },
+    { src: imgNothingToSeeNessie, alt: "Loch Ness, no monster visible",
+      caption: "Loch Ness. The monster was not cooperating." },
+    { src: imgGrantownTractor, alt: "Motorcycles parked next to tractor at B&B",
+      caption: "Secure parking at our B&B in Grantown-on-Spey." },
+  ]}
+/>
 
 Day four delivered Loch Ness — we pulled on our rain gear, I wiped the lens of my camera, and the famous monster remained undetectable beneath what was, in fairness, not excellent visibility. A brief stop at Fort Augustus for a sandwich from the tourist shop. An obligatory stop, executed without sentiment. That evening, at our guesthouse in Tain, a rack of local flyers caught our eye. Clynelish Distillery. A "Flavour Journey." We booked it for the following morning.
-
-<figure class="travel-photo travel-photo--single">
-  <Image src={imgNothingToSeeNessie} alt="Loch Ness in the rain, monster-less" widths={[800, 1200, 1600]} sizes="(max-width: 720px) 100vw, 720px" />
-</figure>
 
 ---
 
@@ -141,72 +151,80 @@ Day four delivered Loch Ness — we pulled on our rain gear, I wiped the lens of
 
 By half past ten the next morning we were at Clynelish Distillery in Brora. They gave us a tour, a tasting, and a presentation case of bottles to take home on the motorcycle. The Flavour Journey: recommended.
 
-<PhotoRow
+<PhotoCarousel
+  aspect="4/3"
   images={[
-    { src: imgBroraTasting },
-    { src: imgBroraKettles },
+    { src: imgBroraKettles, alt: "The copper pot stills at Clynelish Distillery, Brora", caption: "The copper pot stills at Clynelish Distillery, Brora." },
+    { src: imgBroraTasting, alt: "Whisky tasting at Clynelish Distillery", caption: "The Flavour Journey. The case made it home intact. Mostly." },
   ]}
 />
 
-Onward, north. John o'Groats we passed with a wave — it is, in the end, a car park and a signpost — and pressed on to Duncansby Head, which actually delivers on the geography. Sheep, dramatic rock stacks dropping into the sea, and a species of seabird called a Guillemot that looks, with its upright posture and dark-and-white colouring, exactly like a penguin that has gotten considerably lost. Also: wind.
+Onward, north. John o' Groats we passed with a wave — it is, in the end, a car park and a signpost — and pressed on to Duncansby Head, which actually delivers on the geography. Sheep, dramatic rock stacks dropping into the sea, and a species of seabird called a Guillemot that looks, with its upright posture and dark-and-white colouring, exactly like a penguin that has gotten considerably lost. Also: wind.
 
-<PhotoCarousel
-  images={[
-    { src: imgGuillemots, alt: "Guillemots at Duncansby Head" },
-    { src: imgDuncansby, alt: "Rock stacks at Duncansby Head" },
-    { src: imgDunnet, alt: "Dunnet Head" },
-  ]}
+<PhotoGroup
+  landscape={imgDuncansby}
+  portrait1={imgGuillemots}
+  portrait2={imgDunnet}
+  landscapeAlt="Rock stacks at Duncansby Head"
+  portrait1Alt="Guillemots at Duncansby Head"
+  portrait2Alt="Dunnet Head, the northernmost point of mainland Britain"
+  caption="Duncansby Head. The guillemots had nowhere better to be either."
 />
 
 The Strathy Inn that night was basic in the manner of a place that has correctly identified that its customers — motorcyclists, hikers, people who have run out of road — are not primarily there for the amenities. This far north, "desolate" is not a complaint. It's a description.
 
----
+Somewhere south of Durness, the road follows the River Dionard inland. For twenty kilometres or so, there is nothing alongside it but the river. No houses. No car parks. Just the occasional passing place sign on the side of a poorly-maintained strip of tarmac threading through a landscape that has declined, decisively, to accommodate human presence.
 
-<div class="nothing-section">
-  <div class="nothing-word">Nothing</div>
+I pulled over. My father did the same, a few seconds behind me as always. I took a photograph, though I'm not sure what I was trying to capture. The absence of something doesn't photograph easily.
 
-  Somewhere south of Durness, the road follows the River Dionard inland. For twenty kilometres or so, there is nothing alongside it but the river. No houses. No car parks. Just the occasional passing place sign on the side of a poorly-maintained strip of tarmac threading through a landscape that has declined, decisively, to accommodate human presence.
+It was the first time on the trip I got goosebumps.
 
-  <figure class="travel-photo travel-photo--single travel-photo--nothing">
-    <Image src={imgRiverDionard} alt="River Dionard, twenty kilometres of nothing" widths={[800, 1200, 1600]} sizes="(max-width: 720px) 100vw, 720px" />
-  </figure>
-
-  I pulled over. My father did the same, a few seconds behind me as always. I took a photograph, though I'm not sure what I was trying to capture. The absence of something doesn't photograph easily.
-
-  It was the first time on the trip I got goosebumps.
-</div>
+<InlinePhoto
+  src={imgRiverDionard}
+  alt="The River Dionard, northwest Highlands"
+  caption="The River Dionard, northwest Highlands."
+/>
 
 ---
 
 ## Part Five — The west coast, and why it has to be grey
 
 Day six continued west along the north coast before turning south — the causeway at Kyle of Tongue, Smoo Cave (genuinely worth it, tourists notwithstanding), the long descent toward Ullapool. At Kylesku Bridge, a small food truck sat at an otherwise deserted viewpoint. We stopped. The owner's card terminal had difficulty finding a network signal, which in that location was entirely understandable. We waited. It connected. Snacks were obtained. The transaction felt like a minor victory over geography.
-
-<figure class="travel-photo travel-photo--single">
-  <Image src={imgKyleskuBridge} alt="Kylesku Bridge viewpoint food truck" widths={[800, 1200, 1600]} sizes="(max-width: 720px) 100vw, 720px" />
-</figure>
+<PhotoCarousel
+  aspect="1/1"
+  images={[
+    { src: imgSmooCaveInside, alt: "Inside Smoo Cave, looking out", caption: "Inside Smoo Cave, looking out." },
+    { src: imgSmooCaveOutside, alt: "Smoo Cave entrance, Durness", caption: "Smoo Cave cove, Durness." },
+    { src: imgKyleskuBridge, alt: "Kylesku Bridge, northwest Sutherland", caption: "Kylesku Bridge. The food truck's card terminal eventually found a signal." },
+    { src: imgSutherland, alt: "Sutherland, northwest coast", caption: "The valley at Kylesku. Loch Cairnbawn somewhere below." },
+    { src: imgArdvreckCastle, alt: "Ardvreck Castle ruins on Loch Assynt, Sutherland", caption: "Ardvreck Castle ruins on Loch Assynt, Sutherland." },
+    { src: imgArdvreckRoad, alt: "The road past Ardvreck Castle", caption: "The road past Ardvreck Castle." }
+  ]}
+/>
 
 Ullapool — a proper fishing village on Loch Broom — would have been the ideal overnight. Available accommodation being what it was, we instead rode forty kilometres inland to Inchbae Lodge in Garve: a hotel where the décor had stabilised somewhere in the early 1970s and appeared content to remain there.
 
-Day seven meant riding back west to continue south along the coast. The road from Loch Torridon to Applecross was shrouded, again, in grey. Low cloud sitting on the water. Headlands fading into fog. Here's the thing: it was correct. That kind of weather belongs on that kind of coastline. Grey on the northwest coast of Scotland isn't the absence of atmosphere — it is the atmosphere.
-
-<PhotoCarousel
-  images={[
-    { src: imgLochTorridon, alt: "Loch Torridon in the mist" },
-    { src: imgSmooCaveInside, alt: "Inside Smoo Cave" },
-    { src: imgUllapoolStreet, alt: "Ullapool street scene" },
-  ]}
+<PhotoGroup
+  portrait1={imgUllapoolWater}
+  portrait2={imgUllapoolStreet}
+  portrait1Alt="Ullapool waterfront"
+  portrait2Alt="Ullapool street scene"
+  caption="Ullapool, on Loch Broom. We didn't stay. Something to fix next time."
 />
+
+Day seven meant riding back west to continue south along the coast. The road from Loch Torridon to Applecross was shrouded, again, in grey. Low cloud sitting on the water. Headlands fading into fog. Here's the thing: it was correct. That kind of weather belongs on that kind of coastline. Grey on the northwest coast of Scotland isn't the absence of atmosphere — it is the atmosphere.
 
 ---
 
 {/* Visual pause — transitional images */}
 
 <PhotoCarousel
+  aspect="1/1"
   images={[
-    { src: imgLittleLochBroomBike, alt: "Little Loch Broom with motorcycle" },
-    { src: imgDundonnellRiver, alt: "Dundonnell River" },
-    { src: imgLochTollaidhBike, alt: "Loch Tollaidh with motorcycle" },
+    { src: imgDundonnellRiver, alt: "The River Dundonnell, Wester Ross", caption: "The River Dundonnell" },
+    { src: imgLochTollaidhBike, alt: "Loch Tollaidh, on the road to Applecross", caption: "Loch Tollaidh" },
+    { src: imgLittleLochBroomBike, alt: "Little Loch Broom, northwest coast", caption: "Little Loch Broom, northwest coast." },
+    { src: imgLochTorridon, alt: "Loch Torridon in the grey", caption: "The road towards Applecross. We weren't the only ones with this idea." }
   ]}
 />
 
@@ -216,27 +234,27 @@ Day seven meant riding back west to continue south along the coast. The road fro
 
 The Bealach na Bà — the Pass of the Cattle — climbs from sea level to 626 metres in a matter of kilometres. The ascent takes you into cloud. At the top, visibility is limited.
 
-<figure class="travel-photo travel-photo--single">
-  <Image src={imgBealachNaBa} alt="Ascending the Bealach na Bà through mist" widths={[800, 1200, 1600]} sizes="(max-width: 720px) 100vw, 720px" />
-</figure>
+<InlinePhoto
+  src={imgBealachViewpoint}
+  alt="The descent from the Bealach na Bà"
+  caption="Bealach na Bà viewpoint. The view is out there somewhere."
+/>
 
 Then you begin the descent, and as the road drops below the cloud layer, the valley appears — gradually, then all at once. A steep rock face on the opposite side, growing in scale as you descend, until it fills your entire field of vision.
 
-<figure class="travel-photo travel-photo--single">
-  <Image src={imgBealachViewpoint} alt="The valley appearing from beneath the cloud" widths={[800, 1200, 1600]} sizes="(max-width: 720px) 100vw, 720px" />
-</figure>
+<PhotoGroup
+  landscape={imgBealachNaBa}
+  portrait1={imgBealachGuzzi}
+  portrait2={imgBealachCliff}
+  landscapeAlt="At the top of the Bealach na Bà"
+  portrait1Alt="Ascending the Bealach na Bà through mist"
+  portrait2Alt="The cliff face on the descent from the Bealach na Bà"
+  caption="The Bealach na Bà — the Pass of the Cattle. The cliff face took up the whole sky."
+/>
 
 I rarely feel overwhelmed by the scale of the natural world. The Bealach na Bà was the second time on this trip I got goosebumps. The cliff face took up the whole sky.
 
-<figure class="travel-photo travel-photo--single">
-  <Image src={imgBealachCliff} alt="The cliff face at the Bealach na Bà" widths={[800, 1200, 1600]} sizes="(max-width: 720px) 100vw, 720px" />
-</figure>
-
-After that, Lochcarron was a welcome, quiet end to the day. The hotel had a view of the water and venison on the menu. We slept well.
-
-<figure class="travel-photo travel-photo--single">
-  <Image src={imgBealachGuzzi} alt="Descending the Bealach na Bà on the Guzzi" widths={[800, 1200, 1600]} sizes="(max-width: 720px) 100vw, 720px" />
-</figure>
+After that, Lochcarron was a warm welcome at the end of a cold, wet day — a hotel with a view of the water and a decent enough dinner. We slept well.
 
 ---
 
@@ -244,40 +262,31 @@ After that, Lochcarron was a welcome, quiet end to the day. The hotel had a view
 
 Day eight took us south through Fort William and into Glencoe, which has been dramatic since before anyone was there to appreciate it. We took a detour along Glen Etive, famous as the approach road in the Bond film Skyfall. It was raining. We went anyway. There are places that earn the effort of arriving wet, and Glen Etive is one of them.
 
-<figure class="travel-photo travel-photo--single">
-  <Image src={imgLochEtiveRock} alt="Glen Etive in the rain" widths={[800, 1200, 1600]} sizes="(max-width: 720px) 100vw, 720px" />
-</figure>
-
-The Three Sisters of Glencoe I photographed in portrait orientation. I got two of them in frame. The third one knows what it did.
-
-<figure class="travel-photo travel-photo--single">
-  <Image src={imgThreeSisters} alt="Two of the Three Sisters of Glencoe" widths={[800, 1200, 1600]} sizes="(max-width: 720px) 100vw, 720px" />
-</figure>
+<PhotoGroup
+  landscape={imgLochEtiveRock}
+  portrait1={imgLochEtiveTree}
+  portrait2={imgWetsuit}
+  landscapeAlt="The valley of Glen Etive"
+  portrait1Alt="Loch Etive in the rain"
+  portrait2Alt="Wet gear at Glen Etive"
+  caption="Glen Etive, Glencoe. It was raining. We went anyway."
+/>
 
 Day nine followed the bonnie, bonnie banks o' Loch Lomond, leaving the rural north behind and confronting the mildly unwelcome reality of the trip approaching its end.
-
-<PhotoCarousel
-  images={[
-    { src: imgHappyNessie, alt: "Loch Lomond water view" },
-    { src: imgArdvreckRoad, alt: "Road through the Highlands" },
-    { src: imgArdvreckCastle, alt: "Ardvreck Castle" },
-  ]}
-/>
 
 Glasgow received us without ceremony: a city that never performs for visitors, and is better for it. We caught the Riverside Museum in the afternoon.
 
 <PhotoRow
   images={[
     { src: imgGlasgow },
-    { src: imgRiversideMuseumInside },
+    { src: imgRiversideMuseumInside},
+    { src: imgRiversideMuseumOutside}
   ]}
 />
 
-Glasgow to Newcastle via Carlisle was, by the standards of the preceding nine days, unremarkable. The North Sea terminal at North Shields was the same process in reverse: bikes in the hold, Scotland retreating behind you in the dark. IJmuiden to Lier the following morning was a corridor, not a journey. You turn off the engine in the driveway and there's a silence that sits differently from normal silence.
+<p style="text-align: center; font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-top: 0.5rem; font-family: var(--font-body, 'DM Sans', sans-serif); letter-spacing: 0.02em;">Glasgow and the Riverside Museum. The city doesn't try to impress you. It doesn't need to.</p>
 
-<figure class="travel-photo travel-photo--single">
-  <Image src={imgWetsuit} alt="Motorcycle gear after the ride" widths={[800, 1200, 1600]} sizes="(max-width: 720px) 100vw, 720px" />
-</figure>
+Glasgow to Newcastle via Carlisle was, by the standards of the preceding nine days, unremarkable. The North Sea terminal at North Shields was the same process in reverse: bikes in the hold, Scotland retreating behind you in the dark. IJmuiden to Lier the following morning was a corridor, not a journey. You turn off the engine in the driveway and there's a silence that sits differently from normal silence.
 
 ±2,650 kilometres. Eleven days. One small case of whisky, intact.
 
@@ -287,6 +296,27 @@ Glasgow to Newcastle via Carlisle was, by the standards of the preceding nine da
 
 People ask whether it's worth it: the rain, the detours, the basic accommodation at the edge of the known world, the food truck whose terminal takes three minutes to find a signal. The answer is obviously yes, but that's not quite the right framing. Scotland on a motorcycle isn't a holiday you survive — it's a place that asks something of you, and the asking is the point.
 
+<PhotoCarousel
+  aspect="1/1"
+  images={[
+    { src: imgThreeSisters, alt: "Two of the Three Sisters of Glencoe", caption: "The Three Sisters of Glencoe. I got two of them in frame. The third one knows what it did." },
+    { src: imgHappyNessie, alt: "Happy Nessie souvenir, Fort William tourist shop", caption: "A truly happy Nessie at a tourist shop in Fort William. Only £14.99!" },
+  ]}
+/>
+
 The moments I remember most clearly aren't the famous ones. Not Loch Ness. Not John o'Groats. The moments are a stretch of empty road following a river where there was genuinely nothing for twenty kilometres. A cliff face appearing out of cloud on a descent that hadn't finished impressing you yet. A food truck at a deserted viewpoint, card terminal blinking, waiting for a signal.
 
 One thing Scotland taught me: rain is relative. Back home, I used to check the forecast before taking the bike. Since Scotland, I've stopped doing that. Whatever it's doing out there, it's not Scotland. It's fine.
+
+import TripSpecs from '../../components/TripSpecs.astro';
+
+<TripSpecs
+  motorcycle="Moto Guzzi V7, Guardia d'Onore"
+  camera="OnePlus Nord"
+  route="NC500 & beyond — Lier → IJmuiden → Newcastle → Highlands → Glasgow → Newcastle → IJmuiden → Lier"
+  distance="±2,650 km"
+  days="11"
+  season="July 2023"
+  ferry="DFDS King Seaways, IJmuiden ↔ Newcastle"
+  accommodation="B&Bs and small hotels throughout"
+/>

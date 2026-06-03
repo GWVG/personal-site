@@ -1,0 +1,21 @@
+---
+import { Image, type ImageMetadata } from 'astro:assets';
+
+interface Props {
+	src: ImageMetadata;
+	alt: string;
+	caption?: string;
+}
+
+const { src, alt, caption } = Astro.props;
+---
+
+<figure class="travel-photo travel-photo--single">
+	<Image
+		src={src}
+		alt={alt}
+		widths={[800, 1200, 1600]}
+		sizes="(max-width: 720px) 100vw, 720px"
+	/>
+	{caption && <figcaption>{caption}</figcaption>}
+</figure>

@@ -1,0 +1,73 @@
+---
+interface Props {
+	motorcycle?: string;
+	camera?: string;
+	route?: string;
+	distance?: string | number;
+	days?: string | number;
+	season?: string;
+	ferry?: string;
+	accommodation?: string;
+	notes?: string;
+}
+
+const { motorcycle, camera, route, distance, days, season, ferry, accommodation, notes } = Astro.props;
+
+// Only render items that have values
+const items = [
+	{ label: 'Motorcycle', value: motorcycle },
+	{ label: 'Camera', value: camera },
+	{ label: 'Route', value: route },
+	{ label: 'Distance', value: distance },
+	{ label: 'Days', value: days },
+	{ label: 'Season', value: season },
+	{ label: 'Ferry', value: ferry },
+	{ label: 'Accommodation', value: accommodation },
+	{ label: 'Notes', value: notes },
+].filter((item) => item.value);
+---
+
+{
+	items.length > 0 && (
+		<div class="trip-specs">
+			{items.map((item) => (
+				<div class="trip-specs-item">
+					<span class="trip-specs-label">{item.label}</span>
+					<span class="trip-specs-value">{item.value}</span>
+				</div>
+			))}
+		</div>
+	)
+}
+
+<style>
+	.trip-specs {
+		margin-top: 4rem;
+		padding-top: 2rem;
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+		gap: 1.25rem 2rem;
+	}
+
+	.trip-specs-item {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+
+	.trip-specs-label {
+		font-size: 0.6rem;
+		letter-spacing: 0.15em;
+		text-transform: uppercase;
+		color: rgba(255, 255, 255, 0.3);
+		font-family: var(--font-body, 'DM Sans', sans-serif);
+	}
+
+	.trip-specs-value {
+		font-size: 0.85rem;
+		color: rgba(255, 255, 255, 0.6);
+		font-family: var(--font-body, 'DM Sans', sans-serif);
+		line-height: 1.4;
+	}
+</style>

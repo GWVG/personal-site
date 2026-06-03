@@ -3,80 +3,84 @@ import { Image } from 'astro:assets';
 
 interface PhotoEntry {
 	src: ImageMetadata;
-	alt?: string;
+	alt: string;
+	caption?: string;
 }
 
 interface Props {
 	images: PhotoEntry[];
+	aspect?: string;
 }
 
-const { images } = Astro.props;
+const { images, aspect = '1/1' } = Astro.props;
 const single = images.length === 1;
 const carouselId = `carousel-${Math.random().toString(36).substr(2, 9)}`;
 ---
 
 <div class="carousel" data-carousel data-carousel-id={carouselId}>
-	<div class="carousel-wrapper">
-		{
-			!single && (
-				<button class="carousel-prev" aria-label="Previous photo">
-					‹
-				</button>
-			)
-		}
+	<div class="carousel-outer" style={`--carousel-aspect: ${aspect ?? '1/1'}`}>
+		<div class="carousel-track">
+			{
+				!single && (
+					<button class="carousel-prev" aria-label="Previous photo">
+						‹
+					</button>
+				)
+			}
 
-		<div class="carousel-square">
-			<div class="carousel-inner">
-				{
-					images.map(({ src, alt }, i) => (
-						<figure
-							class={`carousel-slide${i === 0 ? ' is-active' : ''}`}
-							role="group"
-							aria-roledescription="slide"
-							aria-label={`${i + 1} of ${images.length}`}
-							aria-hidden={i !== 0 ? 'true' : undefined}
-						>
-							<button class="carousel-slide-button" data-carousel-image={String(i)} data-carousel-src={src.src} aria-label="View fullscreen">
-								<Image
-									src={src}
-									alt={alt ?? ''}
-									widths={[600, 900, 1200]}
-									sizes="(max-width: 720px) 100vw, 720px"
-								/>
-							</button>
-							{alt && <figcaption>{alt}</figcaption>}
-						</figure>
-					))
-				}
+			<div class="carousel-square">
+				<div class="carousel-inner">
+					{
+						images.map(({ src, alt, caption }, i) => (
+							<figure
+								class={`carousel-slide${i === 0 ? ' is-active' : ''}`}
+								role="group"
+								aria-roledescription="slide"
+								aria-label={`${i + 1} of ${images.length}`}
+								aria-hidden={i !== 0 ? 'true' : undefined}
+							>
+								<button class="carousel-slide-button" data-carousel-image={String(i)} data-carousel-src={src.src} aria-label="View fullscreen">
+									<Image
+										src={src}
+										alt={alt}
+										widths={[600, 900, 1200]}
+										sizes="(max-width: 720px) 100vw, 720px"
+									/>
+								</button>
+								{caption && <figcaption>{caption}</figcaption>}
+							</figure>
+						))
+					}
+				</div>
 			</div>
-			{!single && <div class="carousel-counter" data-counter></div>}
+
+			{
+				!single && (
+					<button class="carousel-next" aria-label="Next photo">
+						›
+					</button>
+				)
+			}
 		</div>
 
 		{
 			!single && (
-				<button class="carousel-next" aria-label="Next photo">
-					›
-				</button>
+				<div class="carousel-meta">
+					<span class="carousel-caption"></span>
+					<span class="carousel-counter" data-counter></span>
+				</div>
+			)
+		}
+
+		{
+			!single && (
+				<div class="carousel-nav-mobile">
+					<button class="carousel-prev-mobile" aria-label="Previous photo">‹</button>
+					<button class="carousel-next-mobile" aria-label="Next photo">›</button>
+				</div>
 			)
 		}
 	</div>
-
-	{
-		!single && (
-			<div class="carousel-nav-mobile">
-				<button class="carousel-prev-mobile" aria-label="Previous photo">‹</button>
-				<button class="carousel-next-mobile" aria-label="Next photo">›</button>
-			</div>
-		)
-	}
-
-	{
-		!single && (
-			<div class="carousel-caption">
-				{/* Caption will be inserted here by JavaScript */}
-			</div>
-		)
-	}
 
 	{/* Lightbox — scoped to this carousel */}
 	<div class="carousel-lightbox" data-lightbox-for={carouselId}>
@@ -93,29 +97,32 @@ const carouselId = `carousel-${Math.random().toString(36).substr(2, 9)}`;
 
 <style>
 	.carousel {
-		margin: 2.5rem 0;
 		position: relative;
 	}
 
-	/* Outer wrapper — full width, flex row */
-	.carousel-wrapper {
+	/* Outer container — prose column width */
+	.carousel-outer {
 		width: 100%;
-		display: flex;
-		align-items: center;
-		gap: 0;
-		position: relative;
-		justify-content: center;
+		margin: 2rem 0;
 	}
 
-	/* Square inner container */
+	/* Track — flex row with arrows and square */
+	.carousel-track {
+		display: flex;
+		flex-direction: row;
+		align-items: stretch;
+		width: 100%;
+		gap: 0;
+	}
+
+	/* Square image container */
 	.carousel-square {
-		width: calc(100% - 80px);
-		aspect-ratio: 1 / 1;
+		aspect-ratio: var(--carousel-aspect, 1/1);
+		flex: 1;
+		min-width: 0;
 		position: relative;
 		overflow: hidden;
 		background: var(--color-bg, #0f0f0f);
-		flex-shrink: 0;
-		margin: 0;
 	}
 
 	.carousel-inner {
@@ -128,16 +135,15 @@ const carouselId = `carousel-${Math.random().toString(36).substr(2, 9)}`;
 		position: relative;
 	}
 
+	/* Slides inside square */
 	.carousel-slide {
 		position: absolute;
 		inset: 0;
-		margin: 0;
-		opacity: 0;
-		transition: opacity 600ms ease-in-out;
-		pointer-events: none;
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		opacity: 0;
+		transition: opacity 600ms ease-in-out;
 	}
 
 	.carousel-slide.is-active {
@@ -155,6 +161,15 @@ const carouselId = `carousel-${Math.random().toString(36).substr(2, 9)}`;
 		cursor: zoom-in;
 	}
 
+	.carousel-img {
+		max-width: 100%;
+		max-height: 100%;
+		width: auto;
+		height: auto;
+		object-fit: contain;
+		display: block;
+	}
+
 	.carousel-slide img {
 		max-width: 100%;
 		max-height: 100%;
@@ -162,35 +177,33 @@ const carouselId = `carousel-${Math.random().toString(36).substr(2, 9)}`;
 		height: auto;
 		object-fit: contain;
 		display: block;
-		border-radius: 0;
 	}
 
 	.carousel-slide figcaption {
 		display: none;
 	}
 
-	/* Navigation arrows — outside the square, on desktop */
+	/* Navigation arrows — fixed width, full height */
 	.carousel-prev,
 	.carousel-next {
-		width: 40px;
 		flex-shrink: 0;
+		width: 2rem;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		background: none;
 		border: none;
-		color: rgba(255, 255, 255, 0.4);
-		font-size: 1.5rem;
+		color: rgba(255, 255, 255, 0.35);
+		font-size: 1.2rem;
 		cursor: pointer;
 		padding: 0;
 		transition: color 0.2s;
-		line-height: 1;
-		height: auto;
+		align-self: stretch;
 	}
 
 	.carousel-prev:hover,
 	.carousel-next:hover {
-		color: rgba(255, 255, 255, 0.9);
+		color: rgba(255, 255, 255, 0.8);
 	}
 
 	.carousel-prev:focus-visible,
@@ -199,33 +212,35 @@ const carouselId = `carousel-${Math.random().toString(36).substr(2, 9)}`;
 		outline-offset: 2px;
 	}
 
+	/* Meta below carousel */
+	.carousel-meta {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.25rem;
+		margin-top: 0.6rem;
+		padding: 0 2rem;
+	}
+
+	.carousel-caption {
+		font-size: 0.75rem;
+		color: rgba(255, 255, 255, 0.4);
+		text-align: center;
+		font-family: var(--font-body, 'DM Sans', sans-serif);
+		letter-spacing: 0.02em;
+	}
+
+	.carousel-counter {
+		font-size: 0.6rem;
+		color: rgba(255, 255, 255, 0.2);
+		letter-spacing: 0.12em;
+		text-align: center;
+		font-family: var(--font-body, 'DM Sans', sans-serif);
+	}
+
 	/* Mobile nav — hidden on desktop, shown on mobile */
 	.carousel-nav-mobile {
 		display: none;
-	}
-
-	/* Counter — inside square, bottom right */
-	.carousel-counter {
-		position: absolute;
-		bottom: 0.75rem;
-		right: 0.75rem;
-		font-size: 0.65rem;
-		color: rgba(255, 255, 255, 0.3);
-		letter-spacing: 0.1em;
-		font-family: var(--font-body, 'DM Sans', sans-serif);
-		z-index: 10;
-	}
-
-	/* Caption — below the wrapper, centered */
-	.carousel-caption {
-		text-align: center;
-		font-size: 0.75rem;
-		color: rgba(255, 255, 255, 0.4);
-		margin-top: 0.75rem;
-		font-family: var(--font-body, 'DM Sans', sans-serif);
-		letter-spacing: 0.02em;
-		line-height: 1.4;
-		min-height: 1.4em;
 	}
 
 	/* Lightbox */
@@ -334,13 +349,8 @@ const carouselId = `carousel-${Math.random().toString(36).substr(2, 9)}`;
 
 	/* Mobile (max-width: 640px) */
 	@media (max-width: 640px) {
-		.carousel-wrapper {
+		.carousel-track {
 			flex-direction: column;
-			gap: 0;
-		}
-
-		.carousel-square {
-			width: 100%;
 		}
 
 		/* Hide side arrows on mobile */
