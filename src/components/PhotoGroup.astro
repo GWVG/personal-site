@@ -83,4 +83,18 @@ const { landscape, portrait1, portrait2, landscapeAlt, portrait1Alt, portrait2Al
 		letter-spacing: 0.02em;
 		margin-bottom: 0;
 	}
+
+	@media (max-width: 640px) {
+		.photo-group-bottom {
+			grid-template-columns: 1fr;
+		}
+
+		.photo-group-top img,
+		.photo-group-bottom img {
+			width: 100%;
+			aspect-ratio: auto;
+			object-fit: unset;
+			height: auto;
+		}
+	}
 </style>
