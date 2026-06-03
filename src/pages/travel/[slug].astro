@@ -15,7 +15,7 @@ export async function getStaticPaths() {
 type Props = CollectionEntry<'travel'>;
 
 const post = Astro.props;
-const { title, description, pubDate, country, distance, heroImage, heroTitle, gallery } = post.data;
+const { title, description, subtitle, pubDate, country, distance, heroImage, heroTitle, gallery } = post.data;
 const { Content } = await render(post);
 
 // Hero background URL for CSS parallax (full-res, not displayed via <img>).
@@ -57,6 +57,7 @@ const galleryImages = gallery
 							{!!distance && <span>{distance} km</span>}
 							<FormattedDate date={pubDate} />
 						</div>
+						{subtitle && <p class="post-subtitle">{subtitle}</p>}
 					</div>
 				) : (
 					<div class="prose article-header">
@@ -66,6 +67,7 @@ const galleryImages = gallery
 							{!!distance && <span>{distance} km</span>}
 							<FormattedDate date={pubDate} />
 						</div>
+						{subtitle && <p class="article-subtitle">{subtitle}</p>}
 					</div>
 				)
 			}
@@ -228,16 +230,34 @@ const galleryImages = gallery
 		text-transform: uppercase;
 	}
 
+	.post-subtitle {
+		color: rgb(var(--gray));
+		font-size: 0.95rem;
+		font-weight: 300;
+		font-style: italic;
+		margin-top: 1rem;
+		margin-bottom: 0;
+	}
+
+	.article-subtitle {
+		color: rgb(var(--gray));
+		font-size: 0.95rem;
+		font-weight: 300;
+		font-style: italic;
+		margin-top: 0.5rem;
+		margin-bottom: 1rem;
+	}
+
 	/* ─── Prose ─── */
 	main {
-		width: 1100px;
-		max-width: calc(100% - 2em);
+		width: 100%;
 	}
 
 	.prose {
-		width: 720px;
-		max-width: 100%;
-		margin: 0 auto;
+		max-width: 75ch;
+		margin-left: auto;
+		margin-right: auto;
+		padding: 0 1.5rem;
 	}
 
 	/* Fallback header when no hero image */

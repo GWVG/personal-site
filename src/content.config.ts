@@ -45,6 +45,7 @@ const travel = defineCollection({
 		z.object({
 			title: z.string(),
 			description: z.string(),
+			subtitle: z.string().optional(),
 			pubDate: z.coerce.date(),
 			heroImage: z.optional(image()),
 			heroTitle: z.string().optional(),

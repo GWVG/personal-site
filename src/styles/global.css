@@ -19,6 +19,7 @@
 		0 2px 6px rgba(0, 0, 0, 60%), 0 8px 24px rgba(0, 0, 0, 50%),
 		0 16px 32px rgba(0, 0, 0, 45%);
 }
+
 body {
 	font-family: var(--font-body);
 	font-weight: 400;
@@ -32,12 +33,14 @@ body {
 	font-size: 20px;
 	line-height: 1.6;
 }
+
 main {
 	width: 720px;
 	max-width: calc(100% - 2em);
 	margin: auto;
 	padding: 3em 1em;
 }
+
 h1,
 h2,
 h3,
@@ -48,42 +51,53 @@ h6 {
 	color: rgb(var(--black));
 	line-height: 1.2;
 }
+
 h1 {
 	font-size: 3.052em;
 	font-weight: 700;
 }
+
 h2 {
 	font-size: 2.441em;
 	font-weight: 600;
 }
+
 h3 {
 	font-size: 1.953em;
 	font-weight: 600;
 }
+
 h4 {
 	font-size: 1.563em;
 	font-weight: 500;
 }
+
 h5 {
 	font-size: 1.25em;
 	font-weight: 500;
 }
+
 strong,
 b {
 	font-weight: 700;
 }
+
 a {
 	color: var(--accent);
 }
+
 a:hover {
 	color: var(--accent);
 }
+
 p {
 	margin-bottom: 1em;
 }
+
 .prose p {
 	margin-bottom: 2em;
 }
+
 .prose h2,
 .prose h3,
 .prose h4 {
@@ -107,6 +121,7 @@ p {
 	display: block;
 	overflow-x: auto;
 }
+
 .prose th,
 .prose td {
 	padding: 0.55rem 0.9rem;
@@ -114,6 +129,7 @@ p {
 	border: 1px solid rgb(var(--gray-light));
 	white-space: nowrap;
 }
+
 .prose th {
 	font-weight: 600;
 	font-size: 0.72rem;
@@ -122,37 +138,46 @@ p {
 	color: rgb(var(--black));
 	background: rgb(var(--gray-light));
 }
+
 .prose td {
 	color: rgb(var(--gray-dark));
 	font-variant-numeric: tabular-nums;
 }
+
 .prose tr:nth-child(even) td {
 	background: rgba(255, 255, 255, 0.025);
 }
+
 textarea {
 	width: 100%;
 	font-size: 16px;
 }
+
 input {
 	font-size: 16px;
 }
+
 table {
 	width: 100%;
 }
+
 img {
 	max-width: 100%;
 	height: auto;
 	border-radius: 0;
 }
+
 figure.prose-figure {
 	margin: 2.5rem 0;
 }
+
 figure.prose-figure img {
 	width: 100%;
 	height: auto;
 	display: block;
 	border-radius: 0;
 }
+
 figure.prose-figure figcaption {
 	margin-top: 0.55rem;
 	font-size: 0.82rem;
@@ -161,32 +186,39 @@ figure.prose-figure figcaption {
 	font-style: italic;
 	line-height: 1.4;
 }
+
 code {
 	padding: 2px 5px;
 	background-color: rgb(var(--gray-light));
 	border-radius: 2px;
 }
+
 pre {
 	padding: 1.5em;
 	border-radius: 8px;
 }
-pre > code {
+
+pre>code {
 	all: unset;
 }
+
 blockquote {
 	border-left: 4px solid var(--accent);
 	padding: 0 0 0 20px;
 	margin: 0;
 	font-size: 1.333em;
 }
+
 hr {
 	border: none;
 	border-top: 1px solid rgb(var(--gray-light));
 }
+
 @media (max-width: 720px) {
 	body {
 		font-size: 18px;
 	}
+
 	main {
 		padding: 1em;
 	}
@@ -208,4 +240,174 @@ hr {
 	clip-path: inset(50%);
 	/* added line to stop words getting smushed together (as they go onto separate lines and some screen readers do not understand line feeds as a space */
 	white-space: nowrap;
+}
+
+/* Travel story helpers */
+.travel-nothing {
+	background: #111;
+	color: rgb(var(--gray-dark));
+	padding: 4rem 1.5rem;
+	margin: 4rem 0;
+	text-align: center;
+	border-radius: 0;
+}
+
+.travel-nothing-word {
+	font-size: clamp(3.75rem, 14vw, 8rem);
+	font-style: italic;
+	font-family: var(--font-display);
+	font-weight: 400;
+	line-height: 1;
+	letter-spacing: -0.04em;
+	margin: 0 0 2rem;
+	color: rgba(255, 255, 255, 0.08);
+	user-select: none;
+}
+
+.travel-goosebumps {
+	border-top: 1px solid rgb(var(--gray-light));
+	border-bottom: 1px solid rgb(var(--gray-light));
+	padding: 3rem 0;
+	margin: 4rem 0;
+}
+
+.travel-goosebumps blockquote {
+	margin: 2rem 0;
+	padding: 1.5rem 0 1.5rem 1.25rem;
+	font-size: 1.1em;
+	line-height: 1.6;
+}
+
+.travel-photo {
+	margin: 2.5rem 0;
+}
+
+.travel-photo img {
+	display: block;
+	width: 100%;
+	height: auto;
+	border-radius: 0;
+}
+
+.travel-photo figcaption {
+	margin-top: 0.55rem;
+	font-size: 0.82rem;
+	color: rgb(var(--gray));
+	text-align: center;
+	font-style: italic;
+	line-height: 1.4;
+}
+
+.travel-teaser {
+	margin: 4rem 0 1rem;
+}
+
+.travel-teaser-strip {
+	display: grid;
+	grid-template-columns: repeat(5, minmax(0, 1fr));
+	gap: 4px;
+	margin-bottom: 1rem;
+}
+
+.travel-teaser-strip img {
+	width: 100%;
+	height: 100%;
+	aspect-ratio: 1 / 1;
+	object-fit: cover;
+	display: block;
+}
+
+.travel-teaser-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	font-weight: 600;
+	text-decoration: none;
+	letter-spacing: 0.01em;
+}
+
+.travel-kicker {
+	font-size: 0.68rem;
+	letter-spacing: 0.28em;
+	text-transform: uppercase;
+	color: var(--accent);
+	margin-bottom: 0.9rem;
+}
+
+@media (max-width: 720px) {
+	.travel-teaser-strip {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.travel-goosebumps blockquote {
+		padding-left: 0.9rem;
+	}
+}
+
+/* Travel essay specific styles */
+.travel-subtitle {
+	font-size: 0.85rem;
+	color: rgb(var(--gray));
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	margin-bottom: 3rem;
+	text-align: center;
+}
+
+.nothing-section {
+	position: relative;
+	padding: 6rem 0;
+	margin: 0;
+}
+
+.nothing-word {
+	font-family: var(--font-display);
+	font-size: clamp(6rem, 20vw, 14rem);
+	font-weight: 700;
+	line-height: 1;
+	letter-spacing: -0.02em;
+	opacity: 0.07;
+	position: absolute;
+	top: 0;
+	left: 50%;
+	transform: translateX(-50%);
+	width: 100%;
+	text-align: center;
+	user-select: none;
+	pointer-events: none;
+}
+
+.nothing-section p {
+	line-height: 1.8;
+	margin: 0 0 1.5rem;
+	position: relative;
+	z-index: 1;
+}
+
+.travel-photo--nothing {
+	margin: 2rem 0;
+	position: relative;
+	z-index: 1;
+}
+
+/* Image width classes for editorial layout */
+.img-narrow {
+	max-width: 55ch;
+}
+
+.img-standard {
+	max-width: 75ch;
+}
+
+.img-wide {
+	max-width: min(95vw, 1100px);
+	margin-right: auto;
+}
+
+@media (max-width: 768px) {
+	.img-narrow,
+	.img-standard,
+	.img-wide {
+		max-width: 100%;
+	}
 }
