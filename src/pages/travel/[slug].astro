@@ -54,7 +54,7 @@ const shareText = `${title}${description ? ` — ${description}` : ''}`;
 		)
 	}
 
-	<main>
+	<main class="travel-post">
 		<article>
 			{
 				heroBgSrc ? (
@@ -200,6 +200,13 @@ const shareText = `${title}${description ? ` — ${description}` : ''}`;
 </BaseLayout>
 
 <style>
+	/* ─── Travel post container ─── */
+	.travel-post {
+		width: 720px;
+		max-width: calc(100% - 2em);
+		margin: 0 auto;
+	}
+
 	/* ─── Hero ─── */
 	.hero {
 		position: relative;
@@ -340,10 +347,7 @@ const shareText = `${title}${description ? ` — ${description}` : ''}`;
 	}
 
 	.prose {
-		max-width: 75ch;
-		margin-left: auto;
-		margin-right: auto;
-		padding: 0 1.5rem;
+		padding: 0 1rem;
 	}
 
 	/* Fallback header when no hero image */
