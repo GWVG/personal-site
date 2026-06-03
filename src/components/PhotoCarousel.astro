@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 
 interface PhotoEntry {
-	src: ImageMetadata;
+	src: ImageMetadata | string;
 	alt: string;
 	caption?: string;
 }
@@ -15,6 +15,16 @@ interface Props {
 const { images, aspect = '1/1' } = Astro.props;
 const single = images.length === 1;
 const carouselId = `carousel-${Math.random().toString(36).substr(2, 9)}`;
+
+// Helper function to get image src URL
+const getImageSrc = (src: ImageMetadata | string): string => {
+	return typeof src === 'string' ? src : src.src;
+};
+
+// Helper function to check if image is external
+const isExternal = (src: ImageMetadata | string): boolean => {
+	return typeof src === 'string';
+};
 ---
 
 <div class="carousel" data-carousel data-carousel-id={carouselId}>
@@ -39,13 +49,23 @@ const carouselId = `carousel-${Math.random().toString(36).substr(2, 9)}`;
 								aria-label={`${i + 1} of ${images.length}`}
 								aria-hidden={i !== 0 ? 'true' : undefined}
 							>
-								<button class="carousel-slide-button" data-carousel-image={String(i)} data-carousel-src={src.src} aria-label="View fullscreen">
-									<Image
-										src={src}
-										alt={alt}
-										widths={[600, 900, 1200]}
-										sizes="(max-width: 720px) 100vw, 720px"
-									/>
+								<button class="carousel-slide-button" data-carousel-image={String(i)} data-carousel-src={getImageSrc(src)} aria-label="View fullscreen">
+									{isExternal(src) ? (
+										<img
+											src={getImageSrc(src)}
+											alt={alt}
+											loading="lazy"
+											decoding="async"
+											style="width:100%;height:100%;object-fit:contain;"
+										/>
+									) : (
+										<Image
+											src={src as ImageMetadata}
+											alt={alt}
+											widths={[600, 900, 1200]}
+											sizes="(max-width: 720px) 100vw, 720px"
+										/>
+									)}
 								</button>
 								{caption && <figcaption>{caption}</figcaption>}
 							</figure>
@@ -514,9 +534,12 @@ const carouselId = `carousel-${Math.random().toString(36).substr(2, 9)}`;
 			nextMobileBtn?.addEventListener('click', () => goTo(current + 1));
 
 			// Click to open lightbox
-			slides.forEach((slide, index) => {
+			slides.forEach((slide) => {
 				const btn = slide.querySelector('.carousel-slide-button');
-				btn?.addEventListener('click', () => openLightbox(index));
+				btn?.addEventListener('click', () => {
+					const slideIndex = parseInt(btn.getAttribute('data-carousel-image') ?? '0', 10);
+					openLightbox(slideIndex);
+				});
 			});
 
 			// Lightbox controls

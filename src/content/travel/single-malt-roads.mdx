@@ -4,80 +4,59 @@ heroTitle: "SINGLE MALT ROADS"
 description: "Eleven days. ±2,650 km. Scotland on two wheels."
 subtitle: "A father & son ride · July 2023 · NC500 & beyond"
 pubDate: 2026-05-26
-heroImage: ../../assets/images/travel/single-malt-roads/nothing/river-dionard.jpg
+heroImage: https://res.cloudinary.com/dkuy9qldr/image/upload/f_auto,q_auto,w_1600/single-malt-roads/nothing/river-dionard.jpg
 country: Scotland
 distance: 2650
 ---
 
-import { Image } from 'astro:assets';
 import InlinePhoto from '../../components/InlinePhoto.astro';
 import PhotoCarousel from '../../components/PhotoCarousel.astro';
 import PhotoRow from '../../components/PhotoRow.astro';
 import PhotoGroup from '../../components/PhotoGroup.astro';
+import TripSpecs from '../../components/TripSpecs.astro';
 
-{/* Part 1 */}
-import imgFerry from '../../assets/images/travel/single-malt-roads/part1/ferry.jpg';
-import imgNorthSea from '../../assets/images/travel/single-malt-roads/part1/north-sea.jpg';
-
-{/* Part 2 */}
-import imgScotlandBorderRock from '../../assets/images/travel/single-malt-roads/part2/scotland-border-rock.jpg';
-import imgQueensferry from '../../assets/images/travel/single-malt-roads/part2/queensferry.jpeg';
-import imgKelpies from '../../assets/images/travel/single-malt-roads/part2/the-kelpies.jpg';
-import imgJedburghAbbey from '../../assets/images/travel/single-malt-roads/part2/jedburgh-abbey.jpg';
-
-{/* Part 3 */}
-import imgCairngorms from '../../assets/images/travel/single-malt-roads/part3/cairngorms.jpg';
-import imgGrantownTractor from '../../assets/images/travel/single-malt-roads/part3/grantown-tractor.jpg';
-import imgNothingToSeeNessie from '../../assets/images/travel/single-malt-roads/part3/nothing-to-see-nessie.jpg';
-import imgRoadToFortAugustus from '../../assets/images/travel/single-malt-roads/part3/road-to-fort-augustus.jpg';
-
-{/* Part 4 */}
-import imgBroraKettles from '../../assets/images/travel/single-malt-roads/part4/brora-kettles.jpg';
-import imgBroraTasting from '../../assets/images/travel/single-malt-roads/part4/brora-tasting.jpg';
-import imgDuncansby from '../../assets/images/travel/single-malt-roads/part4/duncansby-2.jpg';
-import imgGuillemots from '../../assets/images/travel/single-malt-roads/part4/guillemots.jpg';
-import imgDunnet from '../../assets/images/travel/single-malt-roads/part4/dunnet.jpg';
-
-{/* Nothing */}
-import imgRiverDionard from '../../assets/images/travel/single-malt-roads/nothing/river-dionard.jpg';
-
-{/* Part 5 */}
-import imgKyleskuBridge from '../../assets/images/travel/single-malt-roads/part5/kylesku-bridge.jpg';
-import imgSmooCaveInside from '../../assets/images/travel/single-malt-roads/part5/smoo-cave-inside.jpg';
-import imgUllapoolStreet from '../../assets/images/travel/single-malt-roads/part5/ullapool-street.jpg';
-import imgSmooCaveOutside from '../../assets/images/travel/single-malt-roads/part5/smoo-cave-outside.jpg';
-import imgSutherland from '../../assets/images/travel/single-malt-roads/part5/sutherland.jpg';
-import imgUllapoolWater from '../../assets/images/travel/single-malt-roads/part5/ullapool-water.jpg';
-
-
-{/* Between 5 and Bealach */}
-import imgLochTorridon from '../../assets/images/travel/single-malt-roads/between-part-5-and-baelachnaba/loch-torridon.jpg';
-import imgDundonnellRiver from '../../assets/images/travel/single-malt-roads/between-part-5-and-baelachnaba/dundonnell-river.jpg';
-import imgLittleLochBroomBike from '../../assets/images/travel/single-malt-roads/between-part-5-and-baelachnaba/little-loch-broom-bike.jpg';
-import imgLochTollaidhBike from '../../assets/images/travel/single-malt-roads/between-part-5-and-baelachnaba/loch-tollaidh-bike.jpg';
-
-import imgArdvreckCastle from '../../assets/images/travel/single-malt-roads/ardvreck/ardvreck-castle.jpg';
-import imgArdvreckRoad from '../../assets/images/travel/single-malt-roads/ardvreck/ardvreck-road.jpg';
-
-{/* Bealach na Bà */}
-import imgBealachNaBa from '../../assets/images/travel/single-malt-roads/baelachnaba/baelach-na-ba.jpg';
-import imgBealachViewpoint from '../../assets/images/travel/single-malt-roads/baelachnaba/bealach-na-ba-viewpoint.jpg';
-import imgBealachCliff from '../../assets/images/travel/single-malt-roads/baelachnaba/baelach-na-ba-cliff.jpg';
-import imgBealachGuzzi from '../../assets/images/travel/single-malt-roads/baelachnaba/baelach-na-ba-guzzi.jpg';
-
-{/* Part 6 */}
-import imgLochEtiveRock from '../../assets/images/travel/single-malt-roads/part6/loch-etive-rock.jpg';
-import imgLochEtiveTree from '../../assets/images/travel/single-malt-roads/part6/loch-etive-tree.jpg';
-import imgWetsuit from '../../assets/images/travel/single-malt-roads/part6/wetsuit.jpg';
-
-import imgThreeSisters from '../../assets/images/travel/single-malt-roads/part6/2-of-the-3-sisters.jpg';
-import imgHappyNessie from '../../assets/images/travel/single-malt-roads/part6/happy-nessie.jpg';
-
-import imgGlasgow from '../../assets/images/travel/single-malt-roads/part6/glasgow.jpg';
-import imgRiversideMuseumInside from '../../assets/images/travel/single-malt-roads/part6/riverside-museum-inside.jpg';
-import imgRiversideMuseumOutside from '../../assets/images/travel/single-malt-roads/part6/riverside-museum-outside.jpg';
-
----
+import {
+  imgFerry,
+  imgNorthSea,
+  imgScotlandBorderRock,
+  imgQueensferry,
+  imgKelpies,
+  imgJedburghAbbey,
+  imgCairngorms,
+  imgGrantownTractor,
+  imgNothingToSeeNessie,
+  imgRoadToFortAugustus,
+  imgBroraKettles,
+  imgBroraTasting,
+  imgDuncansby,
+  imgGuillemots,
+  imgDunnet,
+  imgRiverDionard,
+  imgKyleskuBridge,
+  imgSmooCaveInside,
+  imgUllapoolStreet,
+  imgSmooCaveOutside,
+  imgSutherland,
+  imgUllapoolWater,
+  imgArdvreckCastle,
+  imgArdvreckRoad,
+  imgLochTorridon,
+  imgDundonnellRiver,
+  imgLittleLochBroomBike,
+  imgLochTollaidhBike,
+  imgBealachNaBa,
+  imgBealachViewpoint,
+  imgBealachCliff,
+  imgBealachGuzzi,
+  imgLochEtiveRock,
+  imgLochEtiveTree,
+  imgWetsuit,
+  imgThreeSisters,
+  imgHappyNessie,
+  imgGlasgow,
+  imgRiversideMuseumInside,
+  imgRiversideMuseumOutside,
+} from './single-malt-roads-images.js'
 
 ## Part One — The hardest part
 
@@ -94,8 +73,6 @@ The cabin on the King Seaways was small, windowless, and equipped with a stacked
     { src: imgFerry, alt: "On board the King Seaways", caption: "The King Seaways tracks its wildlife sightings along the route. Harbour porpoise, minke whale, unidentified dolphin. The North Sea, apparently, is busier than it looks." },
   ]}
 />
-
----
 
 ## Part Two — Nobody shouted land ahoy
 
@@ -305,8 +282,6 @@ People ask whether it's worth it: the rain, the detours, the basic accommodation
 The moments I remember most clearly aren't the famous ones. Not Loch Ness. Not John o'Groats. The moments are a stretch of empty road following a river where there was genuinely nothing for twenty kilometres. A cliff face appearing out of cloud on a descent that hadn't finished impressing you yet. A food truck at a deserted viewpoint, card terminal blinking, waiting for a signal.
 
 One thing Scotland taught me: rain is relative. Back home, I used to check the forecast before taking the bike. Since Scotland, I've stopped doing that. Whatever it's doing out there, it's not Scotland. It's fine.
-
-import TripSpecs from '../../components/TripSpecs.astro';
 
 <TripSpecs
   motorcycle="Moto Guzzi V85, Guardia d'Onore"

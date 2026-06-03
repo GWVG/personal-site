@@ -2,19 +2,20 @@
 // Import the global.css file here so that it is included on
 // all pages through the use of the <BaseHead /> component.
 import '../styles/global.css';
-import type { ImageMetadata } from 'astro';
-import FallbackImage from '../assets/river-dionard.jpg';
 import { SITE_TITLE } from '../consts';
+
+const defaultOgImage = "https://res.cloudinary.com/dkuy9qldr/image/upload/f_auto,q_auto,w_1200/single-malt-roads/nothing/river-dionard.jpg";
 
 interface Props {
 	title: string;
 	description: string;
-	image?: ImageMetadata;
+	ogImage?: string;
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
-const { title, description, image = FallbackImage } = Astro.props;
+const { title, description, ogImage } = Astro.props;
+const finalOgImage = ogImage ?? defaultOgImage;
 ---
 
 <!-- Global Metadata -->
@@ -51,11 +52,11 @@ const { title, description, image = FallbackImage } = Astro.props;
 <meta property="og:url" content={Astro.url} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
-{image && <meta property="og:image" content={new URL(image.src, Astro.url)} />}
+<meta property="og:image" content={finalOgImage} />
 
 <!-- Twitter -->
-<meta property="twitter:card" content={image ? 'summary_large_image' : 'summary'} />
+<meta property="twitter:card" content="summary_large_image" />
 <meta property="twitter:url" content={Astro.url} />
 <meta property="twitter:title" content={title} />
 <meta property="twitter:description" content={description} />
-{image && <meta property="twitter:image" content={new URL(image.src, Astro.url)} />}
+<meta property="twitter:image" content={finalOgImage} />

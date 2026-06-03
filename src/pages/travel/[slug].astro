@@ -19,9 +19,7 @@ const { title, description, subtitle, pubDate, country, distance, heroImage, her
 const { Content } = await render(post);
 
 // Hero background URL for CSS parallax (full-res, not displayed via <img>).
-const heroBgSrc = heroImage
-	? (await getImage({ src: heroImage, width: 1920, format: 'webp', quality: 88 })).src
-	: null;
+const heroBgSrc = heroImage ?? null;
 
 // Generate full-res URLs for the lightbox at build time.
 const galleryImages = gallery
@@ -35,14 +33,14 @@ const galleryImages = gallery
 
 // Generate OG image URL
 const ogImage = heroImage
-	? new URL(heroImage.src, Astro.site).href
+	? new URL(heroImage, Astro.site).href
 	: new URL('/og-default.png', Astro.site).href;
 
 // Share text for social media
 const shareText = `${title}${description ? ` — ${description}` : ''}`;
 ---
 
-<BaseLayout title={title} description={description} image={heroImage} ogImage={ogImage} ogType="article">
+<BaseLayout title={title} description={description} ogImage={ogImage} ogType="article">
 	{
 		heroBgSrc && (
 			<div class="hero">

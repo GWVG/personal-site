@@ -2,10 +2,10 @@
 import { Image, type ImageMetadata } from 'astro:assets';
 
 interface Props {
-	landscape?: ImageMetadata;
+	landscape?: ImageMetadata | string;
 	landscapeAlt?: string;
-	portrait1: ImageMetadata;
-	portrait2: ImageMetadata;
+	portrait1: ImageMetadata | string;
+	portrait2: ImageMetadata | string;
 	portrait1Alt: string;
 	portrait2Alt: string;
 	caption?: string;
@@ -17,27 +17,57 @@ const { landscape, portrait1, portrait2, landscapeAlt, portrait1Alt, portrait2Al
 <div class="photo-group">
 	{landscape && (
 		<div class="photo-group-top">
-			<Image
-				src={landscape}
-				alt={landscapeAlt ?? ''}
-				widths={[600, 900, 1200]}
-				sizes="(max-width: 720px) 100vw, 720px"
-			/>
+			{typeof landscape === 'string' ? (
+				<img
+					src={landscape}
+					alt={landscapeAlt ?? ''}
+					loading="lazy"
+					decoding="async"
+					style="width:100%;height:100%;object-fit:contain;"
+				/>
+			) : (
+				<Image
+					src={landscape}
+					alt={landscapeAlt ?? ''}
+					widths={[600, 900, 1200]}
+					sizes="(max-width: 720px) 100vw, 720px"
+				/>
+			)}
 		</div>
 	)}
 	<div class="photo-group-bottom">
-		<Image
-			src={portrait1}
-			alt={portrait1Alt}
-			widths={[300, 450, 600]}
-			sizes="(max-width: 720px) 100vw, 50vw"
-		/>
-		<Image
-			src={portrait2}
-			alt={portrait2Alt}
-			widths={[300, 450, 600]}
-			sizes="(max-width: 720px) 100vw, 50vw"
-		/>
+		{typeof portrait1 === 'string' ? (
+			<img
+				src={portrait1}
+				alt={portrait1Alt}
+				loading="lazy"
+				decoding="async"
+				style="width:100%;height:100%;object-fit:contain;"
+			/>
+		) : (
+			<Image
+				src={portrait1}
+				alt={portrait1Alt}
+				widths={[300, 450, 600]}
+				sizes="(max-width: 720px) 100vw, 50vw"
+			/>
+		)}
+		{typeof portrait2 === 'string' ? (
+			<img
+				src={portrait2}
+				alt={portrait2Alt}
+				loading="lazy"
+				decoding="async"
+				style="width:100%;height:100%;object-fit:contain;"
+			/>
+		) : (
+			<Image
+				src={portrait2}
+				alt={portrait2Alt}
+				widths={[300, 450, 600]}
+				sizes="(max-width: 720px) 100vw, 50vw"
+			/>
+		)}
 	</div>
 	{caption && <p class="photo-group-caption">{caption}</p>}
 </div>

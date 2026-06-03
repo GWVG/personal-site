@@ -15,6 +15,9 @@ export default defineConfig({
 	markdown: {
 		rehypePlugins: [rehypeFigure],
 	},
+	image: {
+		domains: ['res.cloudinary.com'],
+	},
 	vite: {
 		resolve: {
 			alias: {

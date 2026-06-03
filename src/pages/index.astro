@@ -1,5 +1,4 @@
 ---
-import { getImage } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
@@ -9,14 +8,10 @@ const posts = (await getCollection('travel')).sort(
 
 const featured = posts[0] ?? null;
 
-const featuredBgSrc =
-	featured?.data.heroImage
-		? (await getImage({ src: featured.data.heroImage, width: 1920, format: 'webp', quality: 85 }))
-				.src
-		: null;
+const featuredBgSrc = featured?.data.heroImage ?? null;
 ---
 
-<BaseLayout title="Gert-Willem van Gompel" description="Engineer. Builder. Rider.">
+<BaseLayout title="Gert-Willem Van Gompel" description="Engineer. Builder. Rider.">
 	<!-- ─── Hero ─── -->
 	<section class="home-hero">
 		<div class="name-container">
