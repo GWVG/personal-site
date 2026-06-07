@@ -1,0 +1,187 @@
+---
+title: "Push Swap"
+description: "Sorting a stack with a restricted instruction set.
+Circular LIS on a doubled array, two-block B distribution,
+and a four-way cost calculator for minimum moves."
+pubDate: 2024-06-01
+stack: ["C", "Algorithms", "42 Belgium"]
+githubUrl: "https://github.com/GWVG/push-swap"
+---
+
+A 42 Belgium project. The constraint: sort a stack of integers
+using only eleven operations: sa/sb swap the top two elements
+of a stack, pa/pb push the top element from one stack to the
+other, ra/rb rotate a stack up so the top element goes to the
+bottom, rra/rrb rotate down, and rr/rrr rotate both stacks
+simultaneously. The goal is to sort stack A using as few
+moves as possible, with stack B as temporary storage.
+
+If you want to understand the mechanics before reading further,
+[this browser implementation](https://vscza.itch.io/push-swap)
+lets you try the operations yourself.
+
+The standard approach is radix sort or a chunk-based heuristic.
+Both work. Neither is particularly interesting. Radix ignores
+the structure of the input entirely and produces predictable
+but suboptimal move counts. Chunk-based approaches require
+tuning magic constants and still generate unnecessary rotations.
+The question worth asking is not "how do I sort this stack?"
+but "how much of this stack is already sorted?"
+
+## The LIS insight
+
+Longest Increasing Subsequence finds the longest chain of
+elements already in the correct relative order. Those elements
+never need to go to B. They stay in A as a skeleton, and
+everything else gets threaded back in around them.
+
+In practice, the LIS is surprisingly short. For random input
+of n elements, expected LIS length is around √n, which for
+100 elements means keeping roughly 10 in place and pushing
+the other 90 to B. That sounds like it should not work well.
+What makes it competitive is the cost calculator that brings
+those 90 elements back efficiently, combined with a
+distribution strategy that sets up B for cheap reinsertion.
+
+The non-obvious part is that the stack is circular. You can
+rotate it freely, so any rotation of the input is a valid
+starting configuration. A naive LIS implementation finds the
+best subsequence for the input as-is, then separately figures
+out how many rotations are needed to align it. This
+implementation does both simultaneously by running the DP
+on a doubled array of length 2n:
+
+```c
+while (i < size * 2)
+{
+    ext[i] = arr[i % size];
+    compute_lis(ext, i++, ld);
+}
+i = ld->best_end;
+while (i != -1)
+{
+    lis[i % size] = 1;
+    i = ld->prev[i];
+}
+```
+
+Any contiguous window of length n in the doubled array
+corresponds to some rotation of the original stack. The DP
+finds whichever rotation yields the longest increasing
+subsequence without ever explicitly rotating. One pass
+instead of n passes.
+
+There is a secondary tiebreaker: among all LIS of equal
+length, the algorithm selects the most compact one, the
+sequence with minimum total gap between consecutive index
+values. Compact elements sit closer together on the stack,
+which means fewer rotations to expose each one during
+the push phase.
+
+The video below shows the push-to-B phase. Notice that at
+the end, the largest element sits at the top of A. That is the circular LIS
+at work: the algorithm found a rotation where the largest and second largest
+element form the endpoints of the longest increasing
+subsequence, wrapping around the circular stack. The effect
+is modest on random input, but here it is visible.
+
+<video autoplay loop muted playsinline style="width:100%;margin:1.5rem 0;">
+  <source src="https://res.cloudinary.com/dkuy9qldr/video/upload/push-swap/pb.mp4" type="video/mp4" />
+</video>
+
+## Distributing to B: two blocks instead of one
+
+After marking the LIS and pushing everything else to B,
+each push is followed by a conditional rotation:
+
+```c
+pb(ps);
+if (ps->b->top->index < size / 2)
+    rb(ps);
+```
+
+Small elements sink to the bottom of B. Large elements stay
+at the top. This creates two naturally ordered blocks. When
+reinserting into A, elements from both ends of B are closer
+to their insertion points than they would be in a naive pile
+that grows in one direction only.
+
+There is also a micro-optimization during the push phase.
+If the top two elements are one LIS and one non-LIS, and
+swapping them does not violate LIS ordering, it is worth
+doing sa and marking both as LIS. One swap and one extra
+rotation saves a push-to-B and a later reinsertion.
+
+## The cost calculator
+
+Once B holds all non-LIS elements, the reinsertion loop
+evaluates every element currently in B and picks the
+globally cheapest one to insert next. For each candidate,
+it finds the correct insertion point in A, the smallest
+A-element with a larger rank, wrapping to the minimum for
+elements larger than A's current maximum. Then it evaluates
+all four rotation strategies:
+
+```c
+try_rotation_strategies(cost, pos_a,   pos_b,   max(pos_a, pos_b));
+try_rotation_strategies(cost, -down_a, -down_b, max(down_a, down_b));
+try_rotation_strategies(cost, pos_a,   -down_b, pos_a + down_b);
+try_rotation_strategies(cost, -down_a, pos_b,   down_a + pos_b);
+```
+
+The max for same-direction rotations is the key: rr and rrr
+are free for the slower stack. Both stacks move simultaneously,
+so cost is max, not sum. Mixed directions cannot be combined
+and cost sum. A negative value signals "use the reverse
+operation". Costs are recomputed after every insertion because
+the stack state has changed and a cached cost would be
+immediately wrong.
+
+The reinsertion phase, with elements coming back from B
+into their correct positions in A:
+
+<video autoplay loop muted playsinline style="width:100%;margin:1.5rem 0;">
+  <source src="https://res.cloudinary.com/dkuy9qldr/video/upload/push-swap/pa.mp4" type="video/mp4" />
+</video>
+
+## Small inputs
+
+For n of 6 or fewer, an iterative deepening DFS tries all
+five operations at each node to increasing depth, stopping
+at 12. Exponential but bounded. Any branch that cannot
+improve on the current best is pruned immediately.
+
+## Circular LIS
+
+The doubled-array trick covers all possible rotations in a
+single pass: running the DP over an array of length 2n means
+any contiguous window of length n corresponds to some rotation
+of the original stack. In practice the gain over a linear LIS
+turned out to be modest for random inputs, as visible at the
+end of the push-to-B video above.
+
+## Results
+
+Benchmarked over 100 runs each using a shell script
+that generates random unique integers and counts
+operations:
+
+| Input size | Min | Max | Avg | 42 threshold |
+|------------|-----|-----|-----|--------------|
+| n = 100 | 463 | 577 | 522 | ≤ 700 |
+| n = 500 | 4017 | 4728 | 4409 | ≤ 5500 |
+
+All 100 runs cleared the threshold for both input sizes.
+
+
+A full run from start to finish:
+
+<video autoplay loop muted playsinline style="width:100%;margin:1.5rem 0;">
+  <source src="https://res.cloudinary.com/dkuy9qldr/video/upload/push-swap/full.mp4" type="video/mp4" />
+</video>
+
+---
+
+*Visualizer used during development:
+[push_swap_visualizer](https://github.com/o-reo/push_swap_visualizer)
+by o-reo.*
