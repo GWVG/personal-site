@@ -29,14 +29,15 @@ const work = defineCollection({
 
 const build = defineCollection({
 	loader: glob({ base: './src/content/build', pattern: '**/*.{md,mdx}' }),
-	schema: ({ image }) =>
-		z.object({
-			title: z.string(),
-			description: z.string(),
-			pubDate: z.coerce.date(),
-			heroImage: z.optional(image()),
-			status: z.enum(['ongoing', 'completed']),
-		}),
+	schema: z.object({
+		title: z.string(),
+		description: z.string(),
+		pubDate: z.coerce.date(),
+		heroImage: z.string().optional(),
+		heroTitle: z.string().optional(),
+		subtitle: z.string().optional(),
+		status: z.enum(['ongoing', 'completed']),
+	}),
 });
 
 const travel = defineCollection({

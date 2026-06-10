@@ -1,26 +1,9 @@
 ---
 interface Props {
-	motorcycle?: string;
-	camera?: string;
-	route?: string;
-	distance?: string | number;
-	period?: string;
-	ferry?: string;
-	notes?: string;
+	items: Array<{ label: string; value: string }>;
 }
 
-const { motorcycle, camera, route, distance, period, ferry, notes } = Astro.props;
-
-// Only render items that have values
-const items = [
-	{ label: 'Motorcycle', value: motorcycle },
-	{ label: 'Camera', value: camera },
-	{ label: 'Route', value: route },
-	{ label: 'Distance', value: distance },
-	{ label: 'Period', value: period },
-	{ label: 'Ferry', value: ferry },
-	{ label: 'Notes', value: notes },
-].filter((item) => item.value);
+const { items } = Astro.props;
 ---
 
 {

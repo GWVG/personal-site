@@ -1,6 +1,9 @@
 ---
 import { type CollectionEntry, getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import HeroImage from '../../components/HeroImage.astro';
+import ShareButtons from '../../components/ShareButtons.astro';
 
 export async function getStaticPaths() {
 	const projects = await getCollection('build');
@@ -13,23 +16,49 @@ export async function getStaticPaths() {
 type Props = CollectionEntry<'build'>;
 
 const project = Astro.props;
-const { title, description, status } = project.data;
+const { title, description, pubDate, status, heroImage, heroTitle, subtitle } = project.data;
 const { Content } = await render(project);
+
+const heroBgSrc = heroImage ?? null;
+
+const ogImage = heroImage
+	? new URL(heroImage, Astro.site).href
+	: new URL('/og-default.png', Astro.site).href;
+
+const shareText = `${title}${description ? ` — ${description}` : ''}`;
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout title={title} description={description} ogImage={ogImage} ogType="article">
+	{heroBgSrc && <HeroImage heroImage={heroBgSrc} heroTitle={heroTitle ?? title} />}
+
 	<main class="build-post">
 		<article>
-			<header class="post-header">
-				<h1 class="post-title">{title}</h1>
-				<div class="post-meta">
-					<span class="status" data-status={status}>
-						{status === 'ongoing' ? 'Ongoing' : 'Completed'}
-					</span>
-				</div>
-				<p class="post-desc">{description}</p>
-				<hr class="header-rule" />
-			</header>
+			{
+				heroBgSrc ? (
+					<div class="post-header">
+						<h1>{title}</h1>
+						<div class="post-meta">
+							<span class="status" data-status={status}>
+								{status === 'ongoing' ? 'Ongoing' : 'Completed'}
+							</span>
+							<FormattedDate date={pubDate} />
+						</div>
+						{subtitle && <p class="post-subtitle">{subtitle}</p>}
+						<ShareButtons title={shareText} url={Astro.url.href} />
+					</div>
+				) : (
+					<div class="prose article-header">
+						<h1>{title}</h1>
+						<div class="meta">
+							<span class="status" data-status={status}>
+								{status === 'ongoing' ? 'Ongoing' : 'Completed'}
+							</span>
+							<FormattedDate date={pubDate} />
+						</div>
+						{subtitle && <p class="article-subtitle">{subtitle}</p>}
+					</div>
+				)
+			}
 			<div class="prose">
 				<Content />
 			</div>
@@ -42,33 +71,40 @@ const { Content } = await render(project);
 		width: 720px;
 		max-width: calc(100% - 2em);
 		margin: 0 auto;
-		padding: calc(var(--nav-h) + 3.5em) 1em 5em;
 	}
 
-	/* ─── Header ─── */
+	/* ─── Post header (below hero) ─── */
 	.post-header {
-		margin-bottom: 3rem;
+		max-width: 720px;
+		margin: 0 auto;
+		text-align: center;
+		padding: 3.5rem 1rem 2rem;
 	}
 
-	.post-title {
-		font-family: var(--font-display);
-		font-size: clamp(2rem, 5vw, 3.5rem);
-		font-weight: 700;
+	.post-header h1 {
+		font-size: clamp(1.75rem, 4vw, 2.75rem);
 		color: rgb(var(--black));
-		margin: 0 0 1rem;
-		line-height: 1.05;
-		text-transform: uppercase;
-		letter-spacing: 0.02em;
+		margin: 0 0 0.9rem;
+		line-height: 1.15;
+		font-weight: 700;
 	}
 
 	.post-meta {
-		margin-bottom: 1.25rem;
+		display: flex;
+		gap: 1.5rem;
+		justify-content: center;
+		flex-wrap: wrap;
+		align-items: center;
+		color: rgb(var(--gray));
+		font-size: 0.78rem;
+		font-weight: 300;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
 	}
 
-	/* ─── Status badge ─── */
 	.status {
 		display: inline-block;
-		padding: 0.25rem 0.6rem;
+		padding: 0.2rem 0.5rem;
 		border-radius: 2px;
 		background: rgb(var(--gray-light));
 		font-size: 0.68rem;
@@ -83,41 +119,49 @@ const { Content } = await render(project);
 		background: rgba(201, 169, 110, 0.1);
 	}
 
-	/* ─── Description ─── */
-	.post-desc {
-		font-size: 1rem;
-		font-weight: 300;
+	.post-subtitle {
 		color: rgb(var(--gray));
-		line-height: 1.6;
-		margin: 0;
+		font-size: 0.95rem;
+		font-weight: 300;
+		font-style: italic;
+		margin-top: 1rem;
+		margin-bottom: 0;
 	}
 
-	.header-rule {
-		margin-top: 2rem;
-		border: none;
-		border-top: 1px solid rgb(var(--gray-light));
+	.article-subtitle {
+		color: rgb(var(--gray));
+		font-size: 0.95rem;
+		font-weight: 300;
+		font-style: italic;
+		margin-top: 0.5rem;
+		margin-bottom: 1rem;
 	}
 
 	/* ─── Prose ─── */
+	main {
+		width: 100%;
+	}
+
 	.prose {
-		font-size: 1rem;
+		padding: 0 1rem;
 	}
 
-	/* ─── code font in prose ─── */
-	:global(.prose code) {
-		font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, monospace;
-		font-size: 0.85em;
+	/* Fallback header when no hero image */
+	.article-header {
+		padding-top: var(--nav-h);
 	}
 
-	/* ─── fenced code block ─── */
-	:global(.prose pre code) {
-		font-size: 0.82rem;
-		line-height: 1.65;
+	.article-header h1 {
+		margin-bottom: 0.25rem;
 	}
 
-	@media (max-width: 480px) {
-		.build-post {
-			padding: calc(var(--nav-h) + 2rem) 1rem 3rem;
-		}
+	.article-header .meta {
+		display: flex;
+		gap: 1.5rem;
+		flex-wrap: wrap;
+		align-items: center;
+		color: rgb(var(--gray));
+		font-size: 0.95rem;
+		margin-bottom: 2rem;
 	}
 </style>

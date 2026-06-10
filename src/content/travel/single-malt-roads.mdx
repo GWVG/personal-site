@@ -13,7 +13,7 @@ import InlinePhoto from '../../components/InlinePhoto.astro';
 import PhotoCarousel from '../../components/PhotoCarousel.astro';
 import PhotoRow from '../../components/PhotoRow.astro';
 import PhotoGroup from '../../components/PhotoGroup.astro';
-import TripSpecs from '../../components/TripSpecs.astro';
+import Specs from '../../components/Specs.astro';
 
 import {
   imgFerry,
@@ -283,11 +283,11 @@ The moments I remember most clearly aren't the famous ones. Not Loch Ness. Not J
 
 One thing Scotland taught me: rain is relative. Back home, I used to check the forecast before taking the bike. Since Scotland, I've stopped doing that. Whatever it's doing out there, it's not Scotland. It's fine.
 
-<TripSpecs
-  motorcycle="Moto Guzzi V85, Guardia d'Onore"
-  camera="OnePlus Nord"
-  route="NC500 & beyond — Lier → IJmuiden → Newcastle → Highlands → Glasgow → Newcastle → IJmuiden → Lier"
-  distance="±2,650 km"
-  period="9–19 July 2023"
-  ferry="DFDS King Seaways, IJmuiden ↔ Newcastle"
-/>
+<Specs items={[
+  { label: 'Motorcycle', value: "Moto Guzzi V85, Guardia d'Onore" },
+  { label: 'Camera', value: 'OnePlus Nord' },
+  { label: 'Route', value: 'NC500 & beyond — Lier → IJmuiden → Newcastle → Highlands → Glasgow → Newcastle → IJmuiden → Lier' },
+  { label: 'Distance', value: '±2,650 km' },
+  { label: 'Period', value: '9–19 July 2023' },
+  { label: 'Ferry', value: 'DFDS King Seaways, IJmuiden ↔ Newcastle' },
+]} />

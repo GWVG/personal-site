@@ -3,6 +3,8 @@ import { Image, getImage } from 'astro:assets';
 import { type CollectionEntry, getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import FormattedDate from '../../components/FormattedDate.astro';
+import HeroImage from '../../components/HeroImage.astro';
+import ShareButtons from '../../components/ShareButtons.astro';
 
 export async function getStaticPaths() {
 	const posts = await getCollection('travel');
@@ -18,7 +20,6 @@ const post = Astro.props;
 const { title, description, subtitle, pubDate, country, distance, heroImage, heroTitle, gallery } = post.data;
 const { Content } = await render(post);
 
-// Hero background URL for CSS parallax (full-res, not displayed via <img>).
 const heroBgSrc = heroImage ?? null;
 
 // Generate full-res URLs for the lightbox at build time.
@@ -41,16 +42,7 @@ const shareText = `${title}${description ? ` — ${description}` : ''}`;
 ---
 
 <BaseLayout title={title} description={description} ogImage={ogImage} ogType="article">
-	{
-		heroBgSrc && (
-			<div class="hero">
-				<div class="hero-bg" id="hero-bg" style={`background-image: url('${heroBgSrc}')`} />
-				<div class="hero-content">
-					<h1 class="hero-title">{heroTitle ?? title}</h1>
-				</div>
-			</div>
-		)
-	}
+	{heroBgSrc && <HeroImage heroImage={heroBgSrc} heroTitle={heroTitle ?? title} />}
 
 	<main class="travel-post">
 		<article>
@@ -64,29 +56,7 @@ const shareText = `${title}${description ? ` — ${description}` : ''}`;
 							<FormattedDate date={pubDate} />
 						</div>
 						{subtitle && <p class="post-subtitle">{subtitle}</p>}
-						<div class="share-section">
-							<span class="share-label">SHARE</span>
-							<div class="share-buttons">
-								<a href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(Astro.url.href)}&text=${encodeURIComponent(shareText)}`} target="_blank" rel="noopener noreferrer" aria-label="Share on X" class="share-btn">
-									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor" stroke="none"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-								</a>
-								<a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(Astro.url.href)}`} target="_blank" rel="noopener noreferrer" aria-label="Share on Facebook" class="share-btn">
-									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor" stroke="none"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-								</a>
-								<a href={`https://wa.me/?text=${encodeURIComponent(`${shareText} ${Astro.url.href}`)}`} target="_blank" rel="noopener noreferrer" aria-label="Share on WhatsApp" class="share-btn">
-									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor" stroke="none"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-								</a>
-								<a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(Astro.url.href)}`} target="_blank" rel="noopener noreferrer" aria-label="Share on LinkedIn" class="share-btn">
-									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor" stroke="none"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-								</a>
-								<a href={`mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(Astro.url.href)}`} aria-label="Share via email" class="share-btn">
-									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor" stroke="none"><path d="M2 4a2 2 0 012-2h16a2 2 0 012 2v16a2 2 0 01-2 2H4a2 2 0 01-2-2V4zm2 0l8 8 8-8H4zm0 2v12h16V6l-8 8-8-8z"/></svg>
-								</a>
-								<button class="share-btn copy-link" id="copy-link-btn" aria-label="Copy link">
-									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor" stroke="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-								</button>
-							</div>
-						</div>
+						<ShareButtons title={shareText} url={Astro.url.href} />
 					</div>
 				) : (
 					<div class="prose article-header">
@@ -199,45 +169,6 @@ const shareText = `${title}${description ? ` — ${description}` : ''}`;
 		margin: 0 auto;
 	}
 
-	/* ─── Hero ─── */
-	.hero {
-		position: relative;
-		width: 100%;
-		height: 100vh;
-		overflow: hidden;
-		background-color: #111;
-	}
-
-	.hero-bg {
-		position: absolute;
-		inset: 0;
-		background-size: cover;
-		background-position: center bottom;
-		will-change: transform;
-	}
-
-	.hero-content {
-		position: absolute;
-		inset: 0;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		z-index: 1;
-	}
-
-	.hero-title {
-		font-family: var(--font-display);
-		font-size: clamp(5rem, 6vw, 10rem);
-		color: #fff;
-		margin: 0;
-		line-height: 1.1;
-		font-weight: 700;
-		letter-spacing: 0.02em;
-		text-transform: uppercase;
-		text-align: center;
-		padding: 0 2rem;
-	}
-
 	/* ─── Post header (below hero) ─── */
 	.post-header {
 		max-width: 720px;
@@ -282,55 +213,6 @@ const shareText = `${title}${description ? ` — ${description}` : ''}`;
 		font-style: italic;
 		margin-top: 0.5rem;
 		margin-bottom: 1rem;
-	}
-
-	/* ─── Share section ─── */
-	.share-section {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 0.75rem;
-		margin-top: 2rem;
-		padding-top: 2rem;
-		border-top: 1px solid rgba(255, 255, 255, 0.08);
-	}
-
-	.share-label {
-		font-size: 0.65rem;
-		letter-spacing: 0.15em;
-		text-transform: uppercase;
-		color: rgba(255, 255, 255, 0.25);
-		font-weight: 500;
-	}
-
-	.share-buttons {
-		display: flex;
-		gap: 1.25rem;
-		justify-content: center;
-	}
-
-	.share-btn {
-		width: 22px;
-		height: 22px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		color: rgba(255, 255, 255, 0.4);
-		background: none;
-		border: none;
-		cursor: pointer;
-		transition: color 0.2s;
-		padding: 0;
-	}
-
-	.share-btn svg {
-		width: 100%;
-		height: 100%;
-		fill: currentColor;
-	}
-
-	.share-btn:hover {
-		color: rgba(255, 255, 255, 0.9);
 	}
 
 	/* ─── Prose ─── */
@@ -542,25 +424,6 @@ const shareText = `${title}${description ? ` — ${description}` : ''}`;
 </style>
 
 <script>
-	// ─── Hero parallax ───
-	const heroBg = document.getElementById('hero-bg');
-	if (heroBg) {
-		let ticking = false;
-		window.addEventListener(
-			'scroll',
-			() => {
-				if (!ticking) {
-					requestAnimationFrame(() => {
-						(heroBg as HTMLElement).style.transform = `translateY(${window.scrollY * 0.4}px)`;
-						ticking = false;
-					});
-					ticking = true;
-				}
-			},
-			{ passive: true },
-		);
-	}
-
 	// ─── Masonry row-span calculation ───
 	const GAP = 3;
 	const ROW_H = 4;
@@ -591,6 +454,7 @@ const shareText = `${title}${description ? ` — ${description}` : ''}`;
 	// ─── Lightbox ───
 	const el = document.getElementById('lightbox');
 	if (el) {
+		const lightbox = el;
 		const img = document.getElementById('lightbox-img') as HTMLImageElement;
 		const counter = document.getElementById('lightbox-counter')!;
 		const items = Array.from(document.querySelectorAll<HTMLButtonElement>('.masonry-item'));
@@ -629,8 +493,8 @@ const shareText = `${title}${description ? ` — ${description}` : ''}`;
 				if (current === index && isOpen) setPhoto(index, loader.src);
 			};
 			loader.src = fullSrcs[index];
-			el.classList.add('is-open');
-			el.setAttribute('aria-hidden', 'false');
+			lightbox.classList.add('is-open');
+			lightbox.setAttribute('aria-hidden', 'false');
 			document.body.style.overflow = 'hidden';
 			preload((index + 1) % items.length);
 			preload((index - 1 + items.length) % items.length);
@@ -638,8 +502,8 @@ const shareText = `${title}${description ? ` — ${description}` : ''}`;
 
 		function close() {
 			isOpen = false;
-			el.classList.remove('is-open');
-			el.setAttribute('aria-hidden', 'true');
+			lightbox.classList.remove('is-open');
+			lightbox.setAttribute('aria-hidden', 'true');
 			document.body.style.overflow = '';
 			setTimeout(() => {
 				img.src = '';
@@ -671,23 +535,6 @@ const shareText = `${title}${description ? ` — ${description}` : ''}`;
 			if (e.key === 'Escape') close();
 			if (e.key === 'ArrowLeft') navigate(-1);
 			if (e.key === 'ArrowRight') navigate(1);
-		});
-	}
-
-	// ─── Copy link to clipboard ───
-	const copyLinkBtn = document.getElementById('copy-link-btn');
-	if (copyLinkBtn) {
-		copyLinkBtn.addEventListener('click', async () => {
-			try {
-				await navigator.clipboard.writeText(window.location.href);
-				const originalText = copyLinkBtn.innerHTML;
-				copyLinkBtn.innerHTML = '<span style="font-size: 0.6rem; color: rgba(255,255,255,0.6); position: absolute;">Copied!</span>';
-				setTimeout(() => {
-					copyLinkBtn.innerHTML = originalText;
-				}, 2000);
-			} catch (err) {
-				console.error('Failed to copy:', err);
-			}
 		});
 	}
 </script>
