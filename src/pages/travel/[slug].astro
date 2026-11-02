@@ -38,7 +38,7 @@ const ogImage = heroImage
 	: new URL('/og-default.png', Astro.site).href;
 
 // Share text for social media
-const shareText = `${title}${description ? ` — ${description}` : ''}`;
+const shareText = `${title}${description ? ` - ${description}` : ''}`;
 ---
 
 <BaseLayout title={title} description={description} ogImage={ogImage} ogType="article">

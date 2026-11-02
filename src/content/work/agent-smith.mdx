@@ -57,15 +57,15 @@ to history, and repeats.
 
 The loop ends when the LLM calls `final_answer()`, when iteration
 limits are hit, or when the token budget runs out. `final_answer()`
-is not an MCP tool — it is a callable injected directly into the
+is not an MCP tool - it is a callable injected directly into the
 sandbox namespace that raises a `_FinalAnswerSignal` exception caught
 by the orchestrator. For SWE-bench, the argument must be
-`get_patch()` — a git diff of all changes made inside the container.
+`get_patch()` - a git diff of all changes made inside the container.
 
 One design decision worth noting: the system uses raw Python code
 blocks as its action language rather than any native function-calling
 API. The LLM writes `print(run_tests(...))` or `edit_file(...)` as
-Python. This makes the system provider-agnostic — any model that can
+Python. This makes the system provider-agnostic - any model that can
 produce a valid Python code block works, including open-weights models
 that don't support function calling. The downside is the LLM must
 produce syntactically valid Python, which is why the code extractor
@@ -74,11 +74,11 @@ has five fallback formats.
 ## The LLM client
 
 A thin wrapper around any OpenAI-compatible API. Provider switching
-requires no code changes — just different CLI flags. The client
+requires no code changes - just different CLI flags. The client
 detects the right API key environment variable from the provider URL.
 
 Key rotation runs in two layers. Proactive: after every successful
-request, the key index advances unconditionally — round-robin across
+request, the key index advances unconditionally - round-robin across
 all available keys. Reactive: on a 429, the current key goes into
 cooldown for the `Retry-After` duration and the next available key
 takes over. Initial selection is randomised so parallel runs don't
@@ -115,7 +115,7 @@ type. Everything else follows from that.
 The other critical constraint: never call `final_answer()` before
 `run_tests()` passes. Models will attempt to submit the moment they
 think they're done. The prompt makes it explicit, and the orchestrator
-enforces it in code — a `final_answer` that doesn't contain actual
+enforces it in code - a `final_answer` that doesn't contain actual
 diff markers gets rejected and the loop continues.
 
 Think-block handling was a recurring issue. Reasoning models like
@@ -143,7 +143,7 @@ for it.
 
 After every `edit_file` call, the orchestrator automatically runs
 `run_tests()` itself. If the tests pass, it calls
-`final_answer(get_patch())` directly — bypassing the agent entirely.
+`final_answer(get_patch())` directly - bypassing the agent entirely.
 The agent doesn't get to declare victory.
 
 There's also contamination detection. A specific failure mode: the
@@ -181,7 +181,7 @@ Provider latency across all runs:
 | Google | 15855ms |
 
 In our runs, Groq averaged 641ms per request versus 15855ms for
-Google — roughly 25× faster. Over 30 iterations that compounds into
+Google - roughly 25× faster. Over 30 iterations that compounds into
 minutes of difference in wall-clock time.
 
 The exam runs consistently scored 5/6 using qwen3-32b on Groq. The
@@ -193,7 +193,7 @@ attempt across all models and providers.
 **Silent sandbox failures.** Early versions swallowed exceptions
 without feedback. The LLM would call a tool, get no output, and
 hallucinate that it had succeeded. The fix: explicit feedback strings
-for every failure mode — `[IMPORT BLOCKED]`, `[PATH RESTRICTED]`,
+for every failure mode - `[IMPORT BLOCKED]`, `[PATH RESTRICTED]`,
 `[TIMEOUT after Xs]`. Never leave the model guessing.
 
 **The import-outside-candidate-code bug.** MBPP tasks failed
@@ -219,11 +219,11 @@ line.
 
 ## On evaluation and luck
 
-The pass thresholds — 2/3 SWE-bench tasks across three evaluation
-moments — sound straightforward. The statistics tell a different story.
+The pass thresholds - 2/3 SWE-bench tasks across three evaluation
+moments - sound straightforward. The statistics tell a different story.
 
 The [SWE-bench leaderboard](https://www.swebench.com/) is a useful
-reference point. As of mid-2026, Claude Opus 4.6 sits at 75.6% — one
+reference point. As of mid-2026, Claude Opus 4.6 sits at 75.6% - one
 of the top scores on the board, on a paid commercial model. The
 probability of passing at least 2 out of 3 tasks at that success rate:
 
