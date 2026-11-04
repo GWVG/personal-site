@@ -2,6 +2,7 @@
 title: "One clock, seven sources: a home energy data collector"
 description: "A heat pump, a solar inverter, a grid meter, a ventilation unit and two weather feeds, each with its own protocol, written to one InfluxDB bucket on one shared timestamp."
 pubDate: 2026-11-04
+draft: true
 ---
 
 Our house has a NIBE heat pump, a Huawei solar inverter, a HomeWizard P1
