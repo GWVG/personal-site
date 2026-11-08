@@ -6,10 +6,12 @@ import FormattedDate from '../components/FormattedDate.astro';
 
 type Props = CollectionEntry<'blog'>['data'];
 
-const { title, description, pubDate, updatedDate, heroImage, draft } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, ogImage, draft } = Astro.props;
+const social = ogImage ?? heroImage;
+const socialUrl = social ? new URL(social.src, Astro.site).href : undefined;
 ---
 
-<BaseLayout title={title} description={description} image={heroImage} ogType="article">
+<BaseLayout title={title} description={description} ogImage={socialUrl} ogType="article">
 	<main class="blog-post">
 		<article>
 			<header class="post-header">
@@ -41,50 +43,6 @@ const { title, description, pubDate, updatedDate, heroImage, draft } = Astro.pro
 		</article>
 	</main>
 </BaseLayout>
-
-<script>
-	// Renders ```mermaid fences client-side. The library is only fetched when a
-	// page actually contains a diagram; without JS the source stays readable.
-	async function renderMermaid() {
-		const blocks = document.querySelectorAll<HTMLElement>('pre > code.language-mermaid');
-		if (blocks.length === 0) return;
-
-		const { default: mermaid } = await import('mermaid');
-		const css = getComputedStyle(document.documentElement);
-		const rgb = (name: string) => `rgb(${css.getPropertyValue(name).trim()})`;
-
-		mermaid.initialize({
-			startOnLoad: false,
-			theme: 'base',
-			darkMode: true,
-			fontFamily: 'inherit',
-			themeVariables: {
-				background: '#0f0f0f',
-				primaryColor: rgb('--gray-light'),
-				primaryTextColor: rgb('--black'),
-				primaryBorderColor: css.getPropertyValue('--accent').trim(),
-				lineColor: rgb('--gray'),
-				secondaryColor: '#0f0f0f',
-				tertiaryColor: '#161514',
-				clusterBkg: '#161514',
-				clusterBorder: rgb('--gray-light'),
-				edgeLabelBackground: '#0f0f0f',
-			},
-		});
-
-		const nodes: HTMLElement[] = [];
-		blocks.forEach((code) => {
-			const pre = code.parentElement!;
-			const div = document.createElement('div');
-			div.className = 'mermaid-diagram';
-			div.textContent = code.textContent ?? '';
-			pre.replaceWith(div);
-			nodes.push(div);
-		});
-		await mermaid.run({ nodes });
-	}
-	renderMermaid();
-</script>
 
 <style>
 	.blog-post {
@@ -165,14 +123,17 @@ const { title, description, pubDate, updatedDate, heroImage, draft } = Astro.pro
 		line-height: 1.65;
 	}
 
-	:global(.prose .mermaid-diagram) {
-		margin: 2.5rem 0;
-		overflow-x: auto;
-		text-align: center;
+	/* SVG figures (charts, diagrams) render at their own width, never upscaled. */
+	:global(.prose figure.prose-figure img[src*='.svg']) {
+		width: auto;
+		max-width: 100%;
+		margin: 0 auto;
 	}
 
-	:global(.prose .mermaid-diagram svg) {
-		max-width: 100%;
-		height: auto;
+	/* Portrait images (phone screenshots): name the file *-narrow.* to cap the width. */
+	:global(.prose figure.prose-figure img[src*='-narrow']) {
+		width: auto;
+		max-width: min(100%, 320px);
+		margin: 0 auto;
 	}
 </style>

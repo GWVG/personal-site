@@ -14,9 +14,6 @@ export default defineConfig({
 	integrations: [mdx(), sitemap()],
 	markdown: {
 		rehypePlugins: [rehypeFigure],
-		// Mermaid blocks stay as raw <pre><code class="language-mermaid"> so the
-		// client-side renderer in BlogPost.astro can pick them up.
-		syntaxHighlight: { type: 'shiki', excludeLangs: ['mermaid'] },
 	},
 	image: {
 		domains: ['res.cloudinary.com'],
