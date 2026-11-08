@@ -1,0 +1,10 @@
+flowchart TB
+  DEV["Local devices<br/>NIBE · P1 meter · Duco · Huawei · host<br/>polled every 60 s"]
+  WX["Weather<br/>Open-Meteo · MeteoBelgie<br/>cached between fetches"]
+  C["collector.py<br/>one timestamp per cycle"]
+  RAW[("Raw bucket<br/>kept 90 days")]
+  DS[("Long-term bucket<br/>15-minute means")]
+  DEV --> C
+  WX --> C
+  C -->|"batched write"| RAW
+  RAW -->|"every 15 min"| DS
