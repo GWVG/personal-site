@@ -1,40 +1,21 @@
 ---
 import BaseHead from '../components/BaseHead.astro';
 import Nav from '../components/Nav.astro';
-import type { ImageMetadata } from 'astro';
 
 interface Props {
 	title: string;
 	description?: string;
-	image?: ImageMetadata;
 	ogImage?: string;
 	ogType?: string;
 }
 
-const { title, description, image, ogImage, ogType = 'website' } = Astro.props;
+const { title, description, ogImage, ogType } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
-		<BaseHead title={title} description={description} image={image} />
-
-		{/* Open Graph Meta Tags */}
-		<meta property="og:title" content={title} />
-		{description && <meta property="og:description" content={description} />}
-		{ogImage && <meta property="og:image" content={ogImage} />}
-		<meta property="og:url" content={Astro.url.href} />
-		<meta property="og:type" content={ogType} />
-		<meta property="og:site_name" content="Gert-Willem" />
-
-		{/* Twitter Card Meta Tags */}
-		<meta name="twitter:card" content="summary_large_image" />
-		<meta name="twitter:title" content={title} />
-		{description && <meta name="twitter:description" content={description} />}
-		{ogImage && <meta name="twitter:image" content={ogImage} />}
-
-		{/* Canonical URL */}
-		<link rel="canonical" href={Astro.url.href} />
+		<BaseHead title={title} description={description ?? ''} ogImage={ogImage} ogType={ogType} />
 	</head>
 	<body>
 		<Nav />

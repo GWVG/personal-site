@@ -10,11 +10,12 @@ interface Props {
 	title: string;
 	description: string;
 	ogImage?: string;
+	ogType?: string;
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
-const { title, description, ogImage } = Astro.props;
+const { title, description, ogImage, ogType = 'website' } = Astro.props;
 const finalOgImage = ogImage ?? defaultOgImage;
 ---
 
@@ -48,15 +49,16 @@ const finalOgImage = ogImage ?? defaultOgImage;
 <meta name="description" content={description} />
 
 <!-- Open Graph / Facebook -->
-<meta property="og:type" content="website" />
-<meta property="og:url" content={Astro.url} />
+<meta property="og:type" content={ogType} />
+<meta property="og:site_name" content="Gert-Willem" />
+<meta property="og:url" content={canonicalURL} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={finalOgImage} />
 
 <!-- Twitter -->
-<meta property="twitter:card" content="summary_large_image" />
-<meta property="twitter:url" content={Astro.url} />
-<meta property="twitter:title" content={title} />
-<meta property="twitter:description" content={description} />
-<meta property="twitter:image" content={finalOgImage} />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:url" content={canonicalURL} />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={finalOgImage} />
