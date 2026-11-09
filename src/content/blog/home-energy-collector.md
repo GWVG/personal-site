@@ -150,7 +150,9 @@ database as fake data. But if InfluxDB itself is down, that cycle's data
 is logged and dropped. There is no disk queue, no retry.
 
 The database runs on the same host as the collector, and outages have
-been rare. When one happens, the result is a gap in a time series that's
+been rare. Over the last 90 days the grid meter series has six gaps
+longer than two minutes, about 12.6 hours in total, or 99.4% coverage.
+When one happens, the result is a gap in a time series that's
 used for long-term trends, and a gap of a few minutes or hours doesn't
 change a trend. A durable buffer would add state, disk management and
 replay logic to protect data that isn't worth protecting yet.
@@ -180,26 +182,29 @@ than it had outside. In early August it ran at 100% for
 
 ![Duco fan speed, indoor relative humidity, and indoor vs. outdoor absolute humidity, 3 to 5 August 2026](../../assets/blog/home-energy-collector/duco-humidity.svg)
 
-Indoor relative humidity was 70% when the fan reached 100%. It was 70%
-when the fan came back down.
+Indoor relative humidity was 70% when the fan reached 100%. It rose to
+75% in the evening, as the house warmed from 23 to 24 °C, and was back
+at 70% when the fan came down.
 
 The reason is physics. What matters for drying a house is not relative
 humidity but absolute humidity: the actual amount of water in the air.
 Ventilation swaps indoor air for outdoor air, so at best it brings the
 house to the outdoor water content. That night the outdoor air was 20 °C
-at 85% relative humidity. Warmed to the 23 °C inside, that is about 72%.
-The house was already there. The next afternoon it was worse: 32 °C at
-50% outside is about 80% once cooled to 23 °C. For 13 of the 36.5 hours the outdoor air
+at 85% relative humidity. At the 23 °C inside, the same air is at about 71%.
+The house was already there: indoors and outdoors, the dew point was
+around 17.5 °C. The next afternoon it was worse: 32 °C at 50% outside
+is about 85% at 23 °C, a dew point of 20 °C against 18 °C
+inside. For 13 of the 36.5 hours the outdoor air
 held more water than the indoor air, and indoor absolute humidity rose
 from 14.6 to a peak of 16.2 g/m³ while the fan ran flat out to bring it down.
 
 The controller can't tell "the house is humid" from "the weather is
 humid". Automatic mode works off a humidity sensor in the extract duct,
 just before the air enters the unit. The only thing it measures outside
-is temperature. In [one forum thread](https://www.klusidee.nl/Forum/topic/ducobox-silent-ventilatiebox-blijft-in-hoge-stand-draaien-op-de-auto-stand.162520/),
-an owner blames the sensor and replaces it. The new sensor measures the
-same relative humidity, correctly, and the fan does exactly the same
-thing.
+is temperature. That would also explain [a forum thread](https://www.klusidee.nl/Forum/topic/ducobox-silent-ventilatiebox-blijft-in-hoge-stand-draaien-op-de-auto-stand.162520/)
+where an owner with the same symptom replaces the sensor: if the old
+one was working, the new one measures the same relative humidity, and
+the fan does the same thing.
 
 None of the devices could have shown this on its own. It took indoor
 humidity from the Duco, indoor temperature from the heat pump and outdoor
@@ -227,8 +232,11 @@ attic is once again a place I visit voluntarily.
 the first concrete case where the data points to a better control rule:
 only increase ventilation for humidity when the outdoor air is actually
 drier than the indoor air. Everything that rule needs is already in the
-database, so I can test it against historical data before letting it
-control the fan.
+database, so before it controls anything I can replay it on 4 and 5
+August and compare its fan hours with what automatic mode did. What a
+replay can't show is how the house would have responded to a different
+fan setting. That needs a model of the house's humidity, fitted on the
+same data, and that is where this stops being a dashboard problem.
 
 **Further out.** With weather, solar production and consumption on one
 time axis, there are obvious bigger targets: forecasting tomorrow's solar
